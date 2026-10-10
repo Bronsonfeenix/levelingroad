@@ -1,0 +1,268 @@
+// ---------------------------------------------------------------------------
+// SKILLS
+//
+// type 'active'  — used in combat. Each round the combatant casts the FIRST skill in its
+//                  list that is off cooldown, affordable, and whose `cond` passes.
+//                  (Players can reorder their list to set priority.)
+//   cost:  number or (level) => number, paid in the class resource
+//   cd:    cooldown in rounds (0 = every round if affordable)
+//   cond:  optional (c) => bool, e.g. c => c.tgtHp < 0.2
+//   use:   (c) => void, where c is the combat context (see engine/combat.js):
+//          c.lvl c.ap c.sp c.selfHp c.tgtHp
+//          c.weap(mult)            roll weapon damage incl. attack power
+//          c.hit(amount, school)   deal damage (crits, armor, shields applied); returns damage dealt
+//          c.heal(amount)          c.shield(amount)
+//          c.dot(label, perRound, rounds, school)   c.hot(label, perRound, rounds)
+//          c.stun(rounds)          c.buff(label, mods, rounds)   c.debuff(label, mods, rounds)
+//          mods keys: dmgDone, dmgTaken, crit, healDone  (fractions; crit is % points)
+//
+// type 'passive' — talents. Applied when stats are computed:
+//   mods: { pct: { maxHp: 0.1, ap: 0.1, ... }, flat: { crit: 5, dmgDone: 0.1, resRegen: 4, ... } }
+//   onRound: optional (c) => void, runs every round after your attacks (pets, procs)
+//
+// class:    which class can learn it from a trainer ('enemy' = monster ability)
+// minLevel: trainers won't offer it before this level
+// ---------------------------------------------------------------------------
+WL.SKILLS = {
+  // ---------------- EVERY CLASS ----------------
+  first_aid: { class: 'any', type: 'active', name: 'First Aid', cost: 0, cd: 99,
+    desc: 'Once per fight below 40% health: bandage yourself, healing 35% of max health over 3 rounds.',
+    cond: c => c.selfHp < 0.4,
+    use: c => c.hot('First Aid', c.src.maxHp * 0.35 / 3, 3) },
+
+  // ---------------- WARRIOR ----------------
+  heroic_strike: { class: 'warrior', type: 'active', name: 'Heroic Strike', cost: 15, cd: 0,
+    desc: 'A strong attack that adds bonus damage to your weapon swing.',
+    use: c => c.hit(c.weap(1) + 8 + c.lvl * 1.4) },
+  rend: { class: 'warrior', type: 'active', name: 'Rend', cost: 10, cd: 5, minLevel: 4,
+    desc: 'Wounds the target, bleeding them over 5 rounds.',
+    use: c => c.dot('Rend', 3 + c.lvl * 1.1 + c.ap * 0.04, 5) },
+  thunder_clap: { class: 'warrior', type: 'active', name: 'Thunder Clap', cost: 20, cd: 5, minLevel: 6,
+    desc: 'Damages and weakens the enemy, reducing their damage by 15% for 3 rounds.',
+    use: c => { c.hit(6 + c.lvl * 1.5); c.debuff('Thunder Clap', { dmgDone: -0.15 }, 3); } },
+  execute: { class: 'warrior', type: 'active', name: 'Execute', cost: 15, cd: 0, minLevel: 20,
+    desc: 'Massive finishing blow. Only usable below 20% enemy health.',
+    cond: c => c.tgtHp < 0.2,
+    use: c => c.hit(c.weap(1) + 25 + c.lvl * 4 + c.ap * 0.35) },
+  mortal_strike: { class: 'warrior', type: 'active', name: 'Mortal Strike', cost: 30, cd: 3, minLevel: 30,
+    desc: 'A vicious strike dealing 160% weapon damage.',
+    use: c => c.hit(c.weap(1.6) + c.lvl * 2) },
+  shield_wall: { class: 'warrior', type: 'active', name: 'Shield Wall', cost: 0, cd: 99, minLevel: 28,
+    desc: 'Once per fight below 35% health: take 60% less damage for 3 rounds.',
+    cond: c => c.selfHp < 0.35,
+    use: c => c.buff('Shield Wall', { dmgTaken: -0.6 }, 3) },
+  cruelty: { class: 'warrior', type: 'passive', name: 'Cruelty', desc: '+5% critical strike chance.',
+    mods: { flat: { crit: 5 } } },
+  toughness: { class: 'warrior', type: 'passive', name: 'Toughness', desc: '+12% armor and +6% health.',
+    mods: { pct: { armor: 0.12, maxHp: 0.06 } } },
+  anger_management: { class: 'warrior', type: 'passive', name: 'Anger Management', minLevel: 10,
+    desc: 'Generate 5 extra rage per round.', mods: { flat: { resRegen: 5 } } },
+
+  // ---------------- PALADIN ----------------
+  judgement: { class: 'paladin', type: 'active', name: 'Judgement', cost: l => 15 + l, cd: 2,
+    desc: 'Unleash holy energy on the enemy.',
+    use: c => c.hit(14 + c.lvl * 2.6 + c.sp * 0.6 + c.ap * 0.1, 'holy') },
+  holy_light: { class: 'paladin', type: 'active', name: 'Holy Light', cost: l => 25 + l * 2, cd: 3,
+    desc: 'Heals you when below 55% health.', cond: c => c.selfHp < 0.55,
+    use: c => c.heal(30 + c.lvl * 5 + c.sp * 0.6) },
+  hammer_of_justice: { class: 'paladin', type: 'active', name: 'Hammer of Justice', cost: l => 15 + l, cd: 6, minLevel: 8,
+    desc: 'Stuns the enemy for 1 round.',
+    use: c => { c.hit(5 + c.lvl, 'holy'); c.stun(1); } },
+  consecration: { class: 'paladin', type: 'active', name: 'Consecration', cost: l => 30 + l * 2, cd: 5, minLevel: 20,
+    desc: 'Consecrates the ground, dealing holy damage over 4 rounds.',
+    use: c => c.dot('Consecration', 8 + c.lvl * 1.6 + c.sp * 0.2, 4, 'holy') },
+  divine_shield: { class: 'paladin', type: 'active', name: 'Divine Shield', cost: 0, cd: 99, minLevel: 18,
+    desc: 'Once per fight below 25% health: immune to damage for 2 rounds.', cond: c => c.selfHp < 0.25,
+    use: c => c.buff('Divine Shield', { dmgTaken: -1 }, 2) },
+  vengeance: { class: 'paladin', type: 'passive', name: 'Vengeance', desc: '+8% damage done.',
+    mods: { flat: { dmgDone: 0.08 } } },
+  divine_strength: { class: 'paladin', type: 'passive', name: 'Divine Strength', desc: '+12% attack power.',
+    mods: { pct: { ap: 0.12 } } },
+  blessing_of_kings: { class: 'paladin', type: 'passive', name: 'Blessing of Kings', minLevel: 30,
+    desc: '+10% health and +10% spell power.', mods: { pct: { maxHp: 0.1, sp: 0.1 } } },
+
+  // ---------------- HUNTER ----------------
+  arcane_shot: { class: 'hunter', type: 'active', name: 'Arcane Shot', cost: l => 10 + l, cd: 2,
+    desc: 'An instant shot of arcane damage.',
+    use: c => c.hit(10 + c.lvl * 2.2 + c.ap * 0.15, 'arcane') },
+  serpent_sting: { class: 'hunter', type: 'active', name: 'Serpent Sting', cost: l => 10 + l, cd: 5, minLevel: 4,
+    desc: 'Poisons the target for 5 rounds.',
+    use: c => c.dot('Serpent Sting', 4 + c.lvl * 1.2 + c.ap * 0.04, 5, 'nature') },
+  concussive_shot: { class: 'hunter', type: 'active', name: 'Concussive Shot', cost: l => 10 + l, cd: 6, minLevel: 8,
+    desc: 'Dazes the enemy, stunning them for 1 round.', use: c => c.stun(1) },
+  aimed_shot: { class: 'hunter', type: 'active', name: 'Aimed Shot', cost: l => 25 + l * 2, cd: 4, minLevel: 20,
+    desc: 'A carefully aimed shot for heavy damage.',
+    use: c => c.hit(c.weap(1.2) + 20 + c.lvl * 3) },
+  multi_shot: { class: 'hunter', type: 'active', name: 'Multi-Shot', cost: l => 20 + l, cd: 3, minLevel: 18,
+    desc: 'Fires several arrows at once.', use: c => c.hit(c.weap(0.9) + c.lvl * 1.5) },
+  beast_companion: { class: 'hunter', type: 'passive', name: 'Beast Companion',
+    desc: 'A pet fights alongside you, biting every round.',
+    onRound: c => c.hit(3 + c.lvl * 1.6 + c.ap * 0.08, 'physical', 'Pet bite') },
+  lethal_shots: { class: 'hunter', type: 'passive', name: 'Lethal Shots', desc: '+5% critical strike chance.',
+    mods: { flat: { crit: 5 } } },
+  trueshot_aura: { class: 'hunter', type: 'passive', name: 'Trueshot Aura', minLevel: 40, desc: '+15% attack power.',
+    mods: { pct: { ap: 0.15 } } },
+
+  // ---------------- ROGUE ----------------
+  sinister_strike: { class: 'rogue', type: 'active', name: 'Sinister Strike', cost: 40, cd: 0,
+    desc: 'An instant strike that causes bonus damage.',
+    use: c => c.hit(c.weap(1.1) + 8 + c.lvl * 1.6) },
+  eviscerate: { class: 'rogue', type: 'active', name: 'Eviscerate', cost: 35, cd: 3, minLevel: 4,
+    desc: 'A finishing move that deals heavy damage.',
+    use: c => c.hit(12 + c.lvl * 4 + c.ap * 0.2) },
+  garrote: { class: 'rogue', type: 'active', name: 'Garrote', cost: 40, cd: 6, minLevel: 10,
+    desc: 'Garrotes the enemy, bleeding them for 5 rounds.',
+    use: c => c.dot('Garrote', 5 + c.lvl * 1.5 + c.ap * 0.05, 5) },
+  kidney_shot: { class: 'rogue', type: 'active', name: 'Kidney Shot', cost: 25, cd: 7, minLevel: 20,
+    desc: 'Stuns the enemy for 2 rounds.', use: c => c.stun(2) },
+  evasion: { class: 'rogue', type: 'active', name: 'Evasion', cost: 0, cd: 99, minLevel: 6,
+    desc: 'Once per fight below 40% health: take 50% less damage for 3 rounds.', cond: c => c.selfHp < 0.4,
+    use: c => c.buff('Evasion', { dmgTaken: -0.5 }, 3) },
+  malice: { class: 'rogue', type: 'passive', name: 'Malice', desc: '+5% critical strike chance.',
+    mods: { flat: { crit: 5 } } },
+  vigor: { class: 'rogue', type: 'passive', name: 'Vigor', desc: '+20 maximum energy and +4 energy per round.',
+    mods: { flat: { resMax: 20, resRegen: 4 } } },
+  dual_wield: { class: 'rogue', type: 'passive', name: 'Dual Wield Specialization', minLevel: 10,
+    desc: 'An off-hand weapon strikes every round.',
+    onRound: c => c.hit(c.weap(0.5), 'physical', 'Off-hand') },
+
+  // ---------------- PRIEST ----------------
+  smite: { class: 'priest', type: 'active', name: 'Smite', cost: l => 12 + l * 1.4, cd: 0,
+    desc: 'Smite an enemy for holy damage.',
+    use: c => c.hit(12 + c.lvl * 2.2 + c.sp * 0.7, 'holy') },
+  power_word_shield: { class: 'priest', type: 'active', name: 'Power Word: Shield', cost: l => 20 + l * 2, cd: 5,
+    desc: 'Absorbs damage. Cast when below 85% health.', cond: c => c.selfHp < 0.85,
+    use: c => c.shield(20 + c.lvl * 5 + c.sp * 0.6, 'Power Word: Shield') },
+  shadow_word_pain: { class: 'priest', type: 'active', name: 'Shadow Word: Pain', cost: l => 15 + l, cd: 5, minLevel: 4,
+    desc: 'Shadow damage over 5 rounds.',
+    use: c => c.dot('Shadow Word: Pain', 6 + c.lvl * 1.5 + c.sp * 0.2, 5, 'shadow') },
+  renew: { class: 'priest', type: 'active', name: 'Renew', cost: l => 20 + l * 1.5, cd: 5, minLevel: 8,
+    desc: 'Heals over 4 rounds. Cast when below 70% health.', cond: c => c.selfHp < 0.7,
+    use: c => c.hot('Renew', 12 + c.lvl * 2.5 + c.sp * 0.3, 4) },
+  mind_blast: { class: 'priest', type: 'active', name: 'Mind Blast', cost: l => 20 + l * 2, cd: 3, minLevel: 10,
+    desc: 'Blasts the target for heavy shadow damage.',
+    use: c => c.hit(20 + c.lvl * 3.5 + c.sp * 0.6, 'shadow') },
+  shadowform: { class: 'priest', type: 'passive', name: 'Shadowform', minLevel: 30,
+    desc: '+15% damage done, -15% damage taken.', mods: { flat: { dmgDone: 0.15, dmgTaken: -0.15 } } },
+  spirit_tap: { class: 'priest', type: 'passive', name: 'Spirit Tap', desc: '+40% mana regeneration.',
+    mods: { pct: { resRegen: 0.4 } } },
+  inner_fire: { class: 'priest', type: 'passive', name: 'Inner Fire', desc: '+40% armor and +5% damage.',
+    mods: { pct: { armor: 0.4 }, flat: { dmgDone: 0.05 } } },
+
+  // ---------------- SHAMAN ----------------
+  lightning_bolt: { class: 'shaman', type: 'active', name: 'Lightning Bolt', cost: l => 12 + l * 1.4, cd: 0,
+    desc: 'Casts a bolt of lightning.',
+    use: c => c.hit(12 + c.lvl * 2.2 + c.sp * 0.7, 'nature') },
+  earth_shock: { class: 'shaman', type: 'active', name: 'Earth Shock', cost: l => 15 + l * 1.5, cd: 4, minLevel: 4,
+    desc: 'Instant nature damage that interrupts (stuns 1 round).',
+    use: c => { c.hit(10 + c.lvl * 2 + c.sp * 0.4, 'nature'); c.stun(1); } },
+  flame_shock: { class: 'shaman', type: 'active', name: 'Flame Shock', cost: l => 15 + l * 1.5, cd: 5, minLevel: 10,
+    desc: 'Burns the enemy and leaves fire damage over 4 rounds.',
+    use: c => { c.hit(8 + c.lvl * 1.4 + c.sp * 0.3, 'fire'); c.dot('Flame Shock', 5 + c.lvl * 1.2 + c.sp * 0.15, 4, 'fire'); } },
+  healing_wave: { class: 'shaman', type: 'active', name: 'Healing Wave', cost: l => 25 + l * 2, cd: 3,
+    desc: 'Heals you when below 50% health.', cond: c => c.selfHp < 0.5,
+    use: c => c.heal(30 + c.lvl * 5 + c.sp * 0.6) },
+  stormstrike: { class: 'shaman', type: 'active', name: 'Stormstrike', cost: l => 15 + l * 1.2, cd: 3, minLevel: 30,
+    desc: 'Strike with your weapon; the enemy takes +20% nature damage for 2 rounds.',
+    use: c => { c.hit(c.weap(1.3)); c.debuff('Stormstrike', { dmgTaken: 0.2 }, 2); } },
+  windfury_weapon: { class: 'shaman', type: 'passive', name: 'Windfury Weapon', minLevel: 20,
+    desc: '25% chance each round for an extra weapon attack.',
+    onRound: c => { if (c.rng.chance(0.25)) c.hit(c.weap(1), 'physical', 'Windfury'); } },
+  elemental_focus: { class: 'shaman', type: 'passive', name: 'Elemental Focus', desc: '+5% crit and +5% spell power.',
+    mods: { flat: { crit: 5 }, pct: { sp: 0.05 } } },
+  stoneskin_totem: { class: 'shaman', type: 'passive', name: 'Stoneskin Totem', desc: '+30% armor, -5% damage taken.',
+    mods: { pct: { armor: 0.3 }, flat: { dmgTaken: -0.05 } } },
+
+  // ---------------- MAGE ----------------
+  frostbolt: { class: 'mage', type: 'active', name: 'Frostbolt', cost: l => 12 + l * 1.4, cd: 0,
+    desc: 'Frost damage that chills: the enemy deals 15% less damage for 2 rounds.',
+    use: c => { c.hit(13 + c.lvl * 2.3 + c.sp * 0.7, 'frost'); c.debuff('Chilled', { dmgDone: -0.15 }, 2); } },
+  fireball: { class: 'mage', type: 'active', name: 'Fireball', cost: l => 15 + l * 1.8, cd: 2, minLevel: 4,
+    desc: 'A big fireball that also burns over 3 rounds.',
+    use: c => { c.hit(16 + c.lvl * 3 + c.sp * 0.8, 'fire'); c.dot('Fireball', 2 + c.lvl * 0.6, 3, 'fire'); } },
+  frost_nova: { class: 'mage', type: 'active', name: 'Frost Nova', cost: l => 15 + l, cd: 6, minLevel: 10,
+    desc: 'Freezes the enemy in place for 1 round.',
+    use: c => { c.hit(5 + c.lvl, 'frost'); c.stun(1); } },
+  arcane_missiles: { class: 'mage', type: 'active', name: 'Arcane Missiles', cost: l => 25 + l * 2.2, cd: 3, minLevel: 8,
+    desc: 'Three missiles of arcane damage.',
+    use: c => { for (let i = 0; i < 3; i++) c.hit(6 + c.lvl * 1.2 + c.sp * 0.25, 'arcane'); } },
+  ice_barrier: { class: 'mage', type: 'active', name: 'Ice Barrier', cost: l => 25 + l * 2, cd: 5, minLevel: 12,
+    desc: 'Absorbs damage. Cast below 70% health.', cond: c => c.selfHp < 0.7,
+    use: c => c.shield(40 + c.lvl * 8 + c.sp * 0.9, 'Ice Barrier') },
+  arcane_intellect: { class: 'mage', type: 'passive', name: 'Arcane Intellect', desc: '+12% spell power and +10% mana.',
+    mods: { pct: { sp: 0.12, resMax: 0.1 } } },
+  arcane_power: { class: 'mage', type: 'passive', name: 'Arcane Power', minLevel: 30, desc: '+15% damage done.',
+    mods: { flat: { dmgDone: 0.15 } } },
+  frost_armor: { class: 'mage', type: 'passive', name: 'Frost Armor', desc: '+150% armor, +5% health, -6% damage taken.',
+    mods: { pct: { armor: 1.5, maxHp: 0.05 }, flat: { dmgTaken: -0.06 } } },
+
+  // ---------------- WARLOCK ----------------
+  shadow_bolt: { class: 'warlock', type: 'active', name: 'Shadow Bolt', cost: l => 12 + l * 1.4, cd: 0,
+    desc: 'Sends a bolt of shadow at the enemy.',
+    use: c => c.hit(13 + c.lvl * 2.3 + c.sp * 0.7, 'shadow') },
+  corruption: { class: 'warlock', type: 'active', name: 'Corruption', cost: l => 15 + l, cd: 5, minLevel: 4,
+    desc: 'Shadow damage over 5 rounds.',
+    use: c => c.dot('Corruption', 7 + c.lvl * 1.6 + c.sp * 0.22, 5, 'shadow') },
+  curse_of_agony: { class: 'warlock', type: 'active', name: 'Curse of Agony', cost: l => 15 + l, cd: 6, minLevel: 8,
+    desc: 'Shadow damage over 6 rounds.',
+    use: c => c.dot('Curse of Agony', 5 + c.lvl * 1.4 + c.sp * 0.18, 6, 'shadow') },
+  drain_life: { class: 'warlock', type: 'active', name: 'Drain Life', cost: l => 20 + l * 1.5, cd: 3, minLevel: 12,
+    desc: 'Drains health from the enemy, healing you for the damage done.', cond: c => c.selfHp < 0.8,
+    use: c => { const d = c.hit(10 + c.lvl * 2 + c.sp * 0.4, 'shadow'); c.heal(d); } },
+  death_coil: { class: 'warlock', type: 'active', name: 'Death Coil', cost: l => 20 + l * 1.5, cd: 8, minLevel: 30,
+    desc: 'Horrifies the enemy (stun 1 round) and heals you.',
+    use: c => { const d = c.hit(15 + c.lvl * 2.5 + c.sp * 0.4, 'shadow'); c.heal(d); c.stun(1); } },
+  summon_voidwalker: { class: 'warlock', type: 'passive', name: 'Summon Voidwalker',
+    desc: 'A voidwalker tanks for you (-8% damage taken) and strikes each round.',
+    mods: { flat: { dmgTaken: -0.08 } },
+    onRound: c => c.hit(2 + c.lvl * 1.1, 'physical', 'Voidwalker') },
+  // (Warlocks start with the Voidwalker; other demons could be alternative passives.)
+  demonic_embrace: { class: 'warlock', type: 'passive', name: 'Demonic Embrace', desc: '+15% health.',
+    mods: { pct: { maxHp: 0.15 } } },
+  shadow_mastery: { class: 'warlock', type: 'passive', name: 'Shadow Mastery', minLevel: 20, desc: '+10% damage done.',
+    mods: { flat: { dmgDone: 0.1 } } },
+
+  // ---------------- DRUID ----------------
+  wrath: { class: 'druid', type: 'active', name: 'Wrath', cost: l => 12 + l * 1.4, cd: 0,
+    desc: 'Causes nature damage to the enemy.',
+    use: c => c.hit(12 + c.lvl * 2.1 + c.sp * 0.7, 'nature') },
+  moonfire: { class: 'druid', type: 'active', name: 'Moonfire', cost: l => 15 + l * 1.2, cd: 4, minLevel: 4,
+    desc: 'Arcane damage plus damage over 4 rounds.',
+    use: c => { c.hit(8 + c.lvl * 1.5 + c.sp * 0.3, 'arcane'); c.dot('Moonfire', 4 + c.lvl + c.sp * 0.12, 4, 'arcane'); } },
+  rejuvenation: { class: 'druid', type: 'active', name: 'Rejuvenation', cost: l => 20 + l * 1.5, cd: 5,
+    desc: 'Heals over 4 rounds. Cast below 75% health.', cond: c => c.selfHp < 0.75,
+    use: c => c.hot('Rejuvenation', 8 + c.lvl * 1.8 + c.sp * 0.25, 4) },
+  maul: { class: 'druid', type: 'active', name: 'Maul', cost: l => 10 + l, cd: 2, minLevel: 10,
+    desc: 'A savage bear swipe with your weapon.', use: c => c.hit(c.weap(1.2) + c.lvl * 2) },
+  starfire: { class: 'druid', type: 'active', name: 'Starfire', cost: l => 25 + l * 2, cd: 3, minLevel: 20,
+    desc: 'A heavy bolt of arcane damage.', use: c => c.hit(25 + c.lvl * 4 + c.sp * 0.9, 'arcane') },
+  bear_form: { class: 'druid', type: 'passive', name: 'Bear Form', minLevel: 10,
+    desc: '+120% armor, +20% health.', mods: { pct: { armor: 1.2, maxHp: 0.2 } } },
+  cat_form: { class: 'druid', type: 'passive', name: 'Cat Form', minLevel: 20,
+    desc: '+25% attack power, +5% crit.', mods: { pct: { ap: 0.25 }, flat: { crit: 5 } } },
+  moonkin_form: { class: 'druid', type: 'passive', name: 'Moonkin Form', minLevel: 30,
+    desc: '+15% spell power, +10% damage done.', mods: { pct: { sp: 0.15 }, flat: { dmgDone: 0.1 } } },
+
+  // ---------------- ENEMY ABILITIES ----------------
+  e_heavy_strike: { class: 'enemy', type: 'active', name: 'Heavy Strike', cd: 3,
+    use: c => c.hit(c.weap(1.6)) },
+  e_frenzy: { class: 'enemy', type: 'active', name: 'Frenzy', cd: 6,
+    use: c => c.buff('Frenzy', { dmgDone: 0.3 }, 3) },
+  e_shadow_bolt: { class: 'enemy', type: 'active', name: 'Shadow Bolt', cd: 2,
+    use: c => c.hit(8 + c.lvl * 3.2, 'shadow') },
+  e_fire: { class: 'enemy', type: 'active', name: 'Flame Burst', cd: 3,
+    use: c => { c.hit(6 + c.lvl * 2.5, 'fire'); c.dot('Burning', 2 + c.lvl * 0.8, 3, 'fire'); } },
+  e_poison: { class: 'enemy', type: 'active', name: 'Poison', cd: 5,
+    use: c => c.dot('Poison', 3 + c.lvl * 1.1, 4, 'nature') },
+  e_heal: { class: 'enemy', type: 'active', name: 'Mend', cd: 5, cond: c => c.selfHp < 0.5,
+    use: c => c.heal(c.src.maxHp * 0.15) },
+  e_stun: { class: 'enemy', type: 'active', name: 'Bash', cd: 6,
+    use: c => { c.hit(c.weap(0.6)); c.stun(1); } },
+  e_harden: { class: 'enemy', type: 'active', name: 'Harden', cd: 6,
+    use: c => c.buff('Harden', { dmgTaken: -0.3 }, 2) },
+  e_enrage: { class: 'enemy', type: 'active', name: 'Enrage', cd: 99, cond: c => c.selfHp < 0.3,
+    use: c => c.buff('Enrage', { dmgDone: 0.4 }, 99) },
+};
+
+// Give every skill its own id (used for cooldowns, saves and the UI).
+for (const [id, sk] of Object.entries(WL.SKILLS)) sk.id = id;
