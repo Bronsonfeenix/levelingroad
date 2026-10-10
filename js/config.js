@@ -5,8 +5,8 @@ window.WL = window.WL || {};
 // Tuning knobs. Most balance work happens here and in data/*.js.
 // ---------------------------------------------------------------------------
 WL.CONFIG = {
-  title: 'Azerothlike',
-  saveKey: 'azerothlike.save.v1',
+  title: 'The Leveling Road',
+  saveKey: 'lvlroad.save.v1',
   saveVersion: 1,
 
   // Run structure: 12 tiers x 5 levels = 1..60.
