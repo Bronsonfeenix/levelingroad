@@ -2,33 +2,69 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Azerothlike</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Ironvale Idle</title>
+  <meta name="description" content="A classic-MMO inspired idle RPG. Grind, loot and level your warrior to 60.">
+  <meta name="theme-color" content="#120d09">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚔️</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div id="app"></div>
-  <div id="tooltip" hidden></div>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">⚔️ <span>Ironvale Idle</span></div>
+      <div class="xpwrap">
+        <div class="xpbar"><div class="xpfill" id="xpFill"></div><div class="xptext" id="xpText"></div></div>
+      </div>
+      <div class="money" id="money"></div>
+    </header>
 
-  <!-- Load order matters: config -> utils -> data -> engine -> ui -> main -->
-  <script src="js/config.js"></script>
-  <script src="js/util/rng.js"></script>
+    <!-- Battlefield: hero on the left, enemies approach from the right -->
+    <section class="stage" id="stage">
+      <canvas id="game"></canvas>
 
-  <script src="js/data/classes.js"></script>
-  <script src="js/data/skills.js"></script>
-  <script src="js/data/enemies.js"></script>
-  <script src="js/data/zones.js"></script>
-  <script src="js/data/items.js"></script>
+      <div class="frame player">
+        <div class="portrait">🛡️<span class="lvl" id="pLevel">1</span></div>
+        <div class="bars">
+          <div class="fname">Warrior</div>
+          <div class="bar hp"><div class="fill" id="pHp"></div><span id="pHpText"></span></div>
+          <div class="bar rage"><div class="fill" id="pRage"></div><span id="pRageText"></span></div>
+        </div>
+      </div>
 
-  <script src="js/engine/stats.js"></script>
-  <script src="js/engine/loot.js"></script>
-  <script src="js/engine/combat.js"></script>
-  <script src="js/engine/events.js"></script>
-  <script src="js/engine/game.js"></script>
+      <div class="frame target hidden" id="target">
+        <div class="bars">
+          <div class="fname"><span id="tName"></span> <span class="elitetag">Elite</span></div>
+          <div class="bar hp"><div class="fill" id="tHp"></div><span id="tHpText"></span></div>
+        </div>
+        <div class="portrait">💀<span class="lvl" id="tLevel">1</span></div>
+      </div>
 
-  <script src="js/ui/render.js"></script>
-  <script src="js/main.js"></script>
+      <div class="zonelabel" id="zoneLabel"></div>
+      <div class="zonebanner" id="zoneBanner"></div>
+      <div class="taphint" id="tapHint">Tap to strike!</div>
+      <div class="death hidden" id="death">
+        <div class="dtitle">You have died</div>
+        <div class="dsub">Returning to life in <span id="deathTimer">6</span>…</div>
+      </div>
+    </section>
+
+    <!-- Menus -->
+    <nav class="tabs" id="tabs"></nav>
+    <section class="panel" id="panel"></section>
+
+    <footer class="foot">A fan-made idle RPG inspired by classic MMOs. Progress is saved in your browser.</footer>
+  </div>
+
+  <div class="tooltip hidden" id="tooltip"></div>
+  <div class="toast" id="toast"></div>
+  <div class="modal hidden" id="modal"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/game.js"></script>
 </body>
 </html>
