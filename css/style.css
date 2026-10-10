@@ -95,7 +95,9 @@ button { font: inherit; color: inherit; }
 .bar.res[data-res="energy"] .fill { background: linear-gradient(#ffe14a, #b89a12); }
 .bar span { position: absolute; inset: 0; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; text-shadow: 0 1px 1px #000; }
 
-.zonelabel { position: absolute; left: 12px; bottom: 8px; font-family: var(--display); font-size: 13px; color: #fff; text-shadow: 0 1px 3px #000; opacity: .85; pointer-events: none; }
+/* Zone name in the top-right corner, like the text above the minimap; the target frame moves down to make room */
+.zonelabel { position: absolute; right: 12px; top: 6px; z-index: 3; font-family: var(--display); font-size: 13px; color: #ffd100; text-shadow: 0 1px 3px #000, 0 0 4px #000; pointer-events: none; }
+.hudright { top: 28px; }
 .zonebanner { position: absolute; left: 0; right: 0; top: 26%; text-align: center; pointer-events: none; opacity: 0; }
 .zonebanner.show { animation: banner 3.4s ease forwards; }
 .zb-name { font-family: var(--display); font-size: clamp(22px, 4vw, 40px); color: #ffe7a3; text-shadow: 0 2px 6px #000, 0 0 20px rgba(0,0,0,.6); }
@@ -106,6 +108,39 @@ button { font: inherit; color: inherit; }
 .death { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; background: rgba(40,60,80,.45); backdrop-filter: grayscale(1); -webkit-backdrop-filter: grayscale(1); pointer-events: none; }
 .dtitle { font-family: var(--display); font-size: clamp(22px, 4vw, 36px); color: #fff; text-shadow: 0 2px 6px #000; }
 .dsub { color: #dfe8f0; text-shadow: 0 1px 3px #000; }
+
+/* ---------- action bar (12 buttons, 36px, 42px apart, as in the Classic MainMenuBar) ---------- */
+/* Sits inside the battlefield, bottom centre */
+/* Centred in the dark ground strip at the bottom of the battlefield (drawn from 288 to 320 of 320 units, so its centre is at 95%) */
+.actionbar-wrap { position: absolute; left: 0; right: 0; top: 95%; height: 0; z-index: 5; display: flex; justify-content: center; align-items: center; pointer-events: none; }
+.actionbar { position: relative; flex: none; width: 512px; height: 43px; transform: scale(var(--abs, 1)); transform-origin: center; pointer-events: auto;
+  background: linear-gradient(#2c2824, #141210); border: 1px solid #000; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,.6); }
+.abtn { position: absolute; bottom: 3px; width: 36px; height: 36px; padding: 0; border: 1px solid #000; border-radius: 3px; background: #0b0a09; cursor: pointer; }
+.abtn.empty { cursor: default; background: rgba(0,0,0,.35); }
+.abtn img.abimg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.abtn .ico-fb { position: absolute; inset: 0; display: grid; place-items: center; font-size: 20px; }
+.ab-cd { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: conic-gradient(transparent calc(360deg - var(--cd, 0deg)), rgba(0,0,0,.7) 0); }
+.ab-hl { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.abtn:hover .ab-hl { background: rgba(255,255,255,.18); }
+.abtn.on .ab-hl { box-shadow: inset 0 0 0 2px #ffd100; }
+.ab-time { position: absolute; inset: 0; z-index: 4; display: grid; place-items: center; pointer-events: none; font: 700 14px var(--body); color: #ffd100; text-shadow: 0 0 2px #000, 0 0 2px #000, 0 1px 2px #000; }
+.abtn.on .ab-time { place-items: end center; font-size: 10px; color: #fff; padding-bottom: 1px; }
+.ab-key { position: absolute; top: 1px; right: 3px; z-index: 4; pointer-events: none; font: 700 11px var(--body); color: #d8d8d8; text-shadow: 0 1px 1px #000, 0 0 2px #000; }
+.abtn.nores img, .abtn.nores .ico-fb { filter: brightness(.55) sepia(1) hue-rotate(185deg) saturate(4); }
+.abtn.oor img, .abtn.oor .ico-fb { filter: brightness(.6) sepia(1) hue-rotate(-50deg) saturate(5); }
+.abtn.unknown img, .abtn.unknown .ico-fb { filter: grayscale(1) brightness(.45); }
+.abtn.pressed, .abtn.queued { transform: translateY(1px); filter: brightness(.8); }
+.abtn.missing::before { content: ''; position: absolute; inset: -4px; z-index: 5; border: 2px solid #ffd100; border-radius: 5px; pointer-events: none; box-shadow: 0 0 8px #ffd100; animation: abpulse .9s infinite alternate; }
+@keyframes abpulse { from { opacity: .25; } to { opacity: 1; } }
+.stage .taphint { bottom: 13%; }
+
+.uierror { position: absolute; top: 16%; left: 0; right: 0; z-index: 4; text-align: center; pointer-events: none; opacity: 0; font: 700 clamp(13px, 1.8vw, 18px) var(--display); text-shadow: 0 1px 2px #000, 0 0 4px #000; }
+.uierror.show { animation: uierr 2s forwards; }
+@keyframes uierr { 0%, 70% { opacity: 1; } 100% { opacity: 0; } }
+.buff.temp.manual { border-color: #ffd100; }
+.buffTag { color: #ffd100; }
+.tobar { margin-left: 8px; vertical-align: 1px; }
+.row.spell[draggable="true"] { cursor: grab; }
 
 /* ---------- tabs & panel ---------- */
 .tabs { display: flex; gap: 4px; margin-top: 12px; overflow-x: auto; scrollbar-width: none; }
@@ -152,7 +187,7 @@ button { font: inherit; color: inherit; }
 
 /* character sheet (Classic paper doll) */
 .sheetwrap { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; align-items: flex-start; }
-.wowframe { width: min(100%, 400px); padding: 10px 12px 12px; border-radius: 10px; position: relative;
+.wowframe { width: min(100%, 470px); padding: 10px 12px 12px; border-radius: 10px; position: relative;
   background: linear-gradient(180deg, #2b2a28, #171615); border: 2px solid #6f6a60; box-shadow: inset 0 0 0 1px #000, 0 8px 24px rgba(0,0,0,.6); }
 .wf-head { display: grid; grid-template-columns: 64px 1fr 64px; align-items: center; margin-bottom: 8px; }
 .wf-portrait { width: 62px; height: 62px; border-radius: 50%; overflow: hidden; border: 3px solid #b8a070; box-shadow: 0 0 0 2px #000, 0 4px 10px rgba(0,0,0,.6); background: #000; font-size: 30px; }
@@ -166,8 +201,12 @@ button { font: inherit; color: inherit; }
 .wf-model { position: relative; border: 1px solid #000; border-radius: 4px; overflow: hidden; box-shadow: inset 0 0 20px #000; }
 #sheetModel { display: block; width: 100%; height: 100%; }
 .wf-model { height: 355px; }
-.wf-model.pd { aspect-ratio: 288 / 512; width: auto; justify-self: center; border: 0; border-radius: 0; box-shadow: none; overflow: visible; }
-.wf-model.pd .wf-res { top: auto; bottom: 6%; right: 50%; transform: translateX(50%); flex-direction: row; }
+/* Race scene (DressUpBackground): picture is 318×332 of a 320×384 texture area, so the layer is scaled up to hide the padding */
+.wf-model.pd { aspect-ratio: 318 / 332; width: 100%; max-width: 340px; height: auto; min-width: 0; justify-self: center; overflow: hidden; box-shadow: inset 0 0 24px #000, 0 0 0 1px #6f6a60; }
+.wf-model.pd::before { content: ''; position: absolute; left: 0; top: 0; width: 100.63%; height: 115.66%; z-index: 0; pointer-events: none;
+  background-image: var(--mbg); background-size: 80% 66.67%, 20% 66.67%, 80% 33.34%, 20% 33.34%; background-position: 0 0, 100% 0, 0 100%, 100% 100%; background-repeat: no-repeat; }
+.wf-model.pd #sheetModel { position: relative; z-index: 1; }
+.wf-model .wf-res { z-index: 2; }
 .wf-res { position: absolute; top: 6px; right: 6px; display: flex; flex-direction: column; gap: 4px; font-size: 12px; }
 .wf-res span { display: flex; align-items: center; gap: 4px; background: rgba(0,0,0,.6); border: 1px solid #555; border-radius: 4px; padding: 1px 5px; }
 .wf-res b { color: #fff; }
@@ -344,6 +383,18 @@ body.creating { overflow: hidden; }
 .cname { display: flex; gap: 6px; margin-bottom: 10px; }
 .cname input { flex: 1; min-width: 0; font: 700 18px var(--display); color: var(--gold2); background: #0e0a07; border: 1px solid var(--line2); border-radius: 6px; padding: 8px 10px; text-align: center; }
 .btn.enter { width: 100%; padding: 12px; font-family: var(--display); font-size: 18px; }
+.btn.back { width: 100%; margin-top: 8px; }
+
+/* character select */
+.charlist { display: grid; gap: 6px; max-height: 420px; overflow-y: auto; }
+.charrow { display: flex; align-items: center; gap: 10px; padding: 8px 10px; text-align: left; cursor: pointer; border-radius: 6px;
+  background: rgba(0,0,0,.45); border: 2px solid var(--line); color: var(--text); }
+.charrow:hover { border-color: var(--gold2); }
+.charrow.on { border-color: var(--gold); background: rgba(58,42,24,.85); box-shadow: 0 0 10px rgba(230,192,104,.3); }
+.charrow .cr-i { flex: none; display: grid; place-items: center; width: 38px; height: 38px; font-size: 24px; }
+.charrow .cr-t { display: flex; flex-direction: column; line-height: 1.25; font-size: 14px; }
+.charrow .cr-t b { font-family: var(--display); font-size: 16px; }
+.sel-btns { margin-top: 12px; }
 
 /* ---------- responsive ---------- */
 @media (max-width: 900px) {
@@ -380,3 +431,59 @@ body.creating { overflow: hidden; }
   .row { flex-wrap: wrap; }
   .buy { width: 100%; }
 }
+
+/* ---------- quests ---------- */
+.vhide { visibility: hidden; }
+.logline.quest, .quest { color: #ffd100; }
+/* Quest tracker under the target frame, like WoW's objective list */
+.qtrack { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; max-width: 240px; text-align: right; text-shadow: 0 1px 2px #000, 0 0 3px #000; }
+.qtrack:empty { display: none; }
+.qt-q b { display: block; font: 700 12px var(--display); color: #ffd100; }
+.qt-q span { display: block; font-size: 11px; color: #e8e8e8; }
+.qt-q.done span { color: #7ad06a; }
+/* Quest log: list on the left, parchment detail on the right */
+.qlog { display: grid; grid-template-columns: minmax(200px, 1fr) minmax(0, 1.4fr); gap: 12px; align-items: start; }
+.qlist { display: flex; flex-direction: column; gap: 1px; max-height: 460px; overflow-y: auto; }
+.ql-zone { font: 700 13px var(--display); color: var(--gold); margin: 8px 0 2px; }
+.ql-zone:first-child { margin-top: 0; }
+.ql-q { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 3px 6px 3px 14px; font: 600 14px var(--body); cursor: pointer; border-radius: 3px; }
+.ql-q:hover, .ql-q.sel { background: rgba(255,209,0,.12); }
+.ql-q.sel { box-shadow: inset 0 0 0 1px rgba(255,209,0,.45); }
+.ql-q.locked { color: #8a8070; cursor: default; font-weight: 400; }
+.ql-q.locked:hover { background: none; }
+.ql-done { color: #7ad06a; font-weight: 400; }
+.qdetail { background: #e8d6a8; color: #2a1a08; border: 1px solid #000; padding: 14px 16px; min-height: 300px; box-shadow: inset 0 0 30px rgba(90,60,20,.35); }
+.qdetail h4 { margin: 0 0 8px; font: 700 18px var(--display); color: #000; }
+.qdetail h5 { margin: 14px 0 4px; font: 700 15px var(--display); color: #000; }
+.qdetail p { margin: 0 0 6px; line-height: 1.4; }
+.qdetail .small { font-size: 13px; }
+.qdetail .coin { color: #2a1a08; }
+.qdetail.empty { display: grid; place-items: center; text-align: center; color: #4a3a20; }
+.qdetail .btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+.qrewards { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 6px; }
+.qreward { display: flex; align-items: center; gap: 6px; padding: 3px; background: rgba(0,0,0,.08); border: 1px solid rgba(0,0,0,.25); border-radius: 3px; cursor: pointer; text-align: left; font: 700 13px var(--body); text-shadow: 0 0 2px #000, 0 1px 1px #000; }
+.qreward.sel { background: rgba(255,209,0,.35); border-color: #8a6a10; box-shadow: 0 0 6px rgba(255,209,0,.6); }
+.qr-i { width: 34px; height: 34px; flex: none; display: grid; place-items: center; font-size: 20px; border: 1px solid #000; background: #1b130c; }
+.qr-i .iico { width: 100%; height: 100%; }
+@media (max-width: 700px) { .qlog { grid-template-columns: 1fr; } .qlist { max-height: 220px; } }
+.qbook { width: 28px; height: 28px; vertical-align: middle; margin-right: 4px; }
+.qdetail, .qdetail p, .qdetail .small { color: #2a1a08; text-shadow: none; }
+.qdetail .ql-done { color: #1d6b12; }
+/* Dark name plates, like the reward frames in WoW, so quality colours stay readable on parchment */
+.qdetail .qreward { background: rgba(0,0,0,.72); border-color: #000; }
+.qdetail .qreward.sel { background: rgba(40,28,0,.85); border-color: #ffd100; }
+@media (max-width: 700px) { .qt-q:nth-child(n+4) { display: none; } }
+
+/* ---------- sound ---------- */
+.mutebtn { flex: none; width: 30px; height: 30px; display: grid; place-items: center; padding: 0; font-size: 16px; line-height: 1; cursor: pointer;
+  background: rgba(0,0,0,.45); border: 1px solid var(--line2); border-radius: 4px; color: inherit; }
+.mutebtn:hover { border-color: var(--gold2); }
+.mutebtn.off { opacity: .6; }
+.settings h4 { margin: 4px 0 0; font: 700 15px var(--display); color: var(--gold); }
+.sound { display: grid; gap: 10px; }
+.sound .toggle { margin-bottom: 0; }
+.vol { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.vol b { min-width: 3em; color: #fff; }
+.vol input[type="range"] { flex: 1; min-width: 140px; max-width: 320px; accent-color: #ffd100; cursor: pointer; }
+.np { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.np b { color: #ffd100; }

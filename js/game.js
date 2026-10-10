@@ -47,33 +47,31 @@ const G = {        // runtime-only state
   canvas: null, ctx: null, W: 800, H: 320, scale: 1, groundY: 268, heroX: 110,
   t: 0, cam: 0, walking: true, last: 0,
   enemy: null, spawnTimer: 0.8, swing: 0.5, heroSwing: -1, heroBig: false, shoot: -1, wandFx: 0, tapCd: 0, hurt: 0,
-  gcd: 0, cast: null, cds: {}, buffs: [], procs: {}, proj: [], petAtk: 1.5, petAnim: 0,
+  gcd: 0, cast: null, cds: {}, cdMax: {}, buffs: [], procs: {}, proj: [], petAtk: 1.5, petAnim: 0, queued: null, queueT: 0,
   dead: false, deadTimer: 0, levelFx: 0,
   fct: [], particles: [], weather: [], weatherType: null,
   tab: 'character', tree: 0, talSel: null, dirty: true, refreshT: 0, saveT: 0, selected: null, hud: {},
-  create: null,
+  create: null, select: null,
 };
 
 function freshState() {
   return {
     version: 2, name: '', faction: 'alliance', race: 'human', cls: 'warrior',
     level: 1, xp: 0, copper: 0, hp: -1, mana: -1, res: 0, combo: 0,
-    equipment: { weapon: null, head: null, chest: null, hands: null, legs: null, feet: null },
-    bag: [], prof: {}, talents: {}, spells: {},
+    equipment: Object.fromEntries(SLOTS.map(s => [s, null])),
+    bag: [], prof: {}, talents: {}, spells: {}, bar: Array(12).fill(null), savedBuffs: [],
     zoneId: null, autoZone: true, autoSell: 1, numbers: true, autoTrain: true,
     kills: 0, elites: 0, deaths: 0, earned: 0, playTime: 0,
     rate: { xp: 0, copper: 0, kills: 0, time: 0 },
+    quests: {}, questsDone: [], autoQuest: true,
     lastSeen: Date.now(), nextId: 1, log: [], welcomed: false,
   };
 }
 
+// Characters are loaded from the character select screen (see account.js for storage)
 function load() {
-  try {
-    const raw = localStorage.getItem(CONFIG.SAVE_KEY);
-    if (raw) { const d = JSON.parse(raw); if (validSave(d)) { applySave(d); return true; } }
-  } catch (e) { console.warn('Could not load save', e); }
+  loadAccount();
   S = null;
-  return false;
 }
 function validSave(d) { return d && typeof d.level === 'number' && CLASSES[d.cls] && RACES.some(r => r.id === d.race); }
 
@@ -84,17 +82,22 @@ function applySave(d) {
   S.rate = Object.assign({ xp: 0, copper: 0, kills: 0, time: 0 }, d.rate || {});
   if (!zonesForChar().some(z => z.id === S.zoneId)) S.zoneId = race().start;
   resetRuntime();
+  // Buffs keep ticking while you're away
+  const away = Math.max(0, (Date.now() - (d.lastSeen || Date.now())) / 1000);
+  for (const b of S.savedBuffs || []) { const ab = abById(b.id); if (ab && ab.kind === 'buff' && knownRanks(ab) && b.left - away > 0) applyManualBuff(ab, b.left - away); }
+  syncBar(); G.barKey = null;
 }
 
 function resetRuntime() {
   STATS = null; ABIL = null; GRANTS = null;
-  Object.assign(G, { enemy: null, dead: false, cast: null, cds: {}, buffs: [], procs: {}, proj: [], gcd: 0, spawnTimer: 1, weather: [] });
+  Object.assign(G, { enemy: null, dead: false, cast: null, cds: {}, cdMax: {}, buffs: [], procs: {}, proj: [], gcd: 0, spawnTimer: 1, weather: [], queued: null });
 }
 
 function save() {
   if (!S) return;
   S.lastSeen = Date.now();
-  try { localStorage.setItem(CONFIG.SAVE_KEY, JSON.stringify(S)); } catch (e) { console.warn('Save failed', e); }
+  S.savedBuffs = G.buffs.filter(b => b.manual).map(b => ({ id: b.id, left: Math.round(b.left) }));
+  saveCharacter(S);
 }
 
 // ---------- lookups ----------
@@ -169,6 +172,7 @@ function trainAbility(ab, quiet) {
   S.copper -= cost;
   S.spells[ab.id] = knownRanks(ab) + 1;
   if (!quiet) log(`You have learned <b>${esc(abName(ab))}</b> (Rank ${S.spells[ab.id]}).`, 'sys');
+  syncBar();
   invalidate(); markDirty();
   return true;
 }
@@ -183,6 +187,7 @@ function autoTrain() {
     n++;
   }
   if (n) log(`Your trainer taught you ${n} new spell rank${n > 1 ? 's' : ''}.`, 'sys');
+  syncBar();
   return n;
 }
 
@@ -242,6 +247,7 @@ function addFx(dst, src, k) {
 function gatherFx() {
   const fx = newFx();
   addFx(fx, race().racial.fx, 1);
+  addFx(fx, accountFx(), 1); // account-wide bonuses (legacy XP, later achievements, collections, heirlooms)
   for (const tr of trees()) for (const t of tr.talents) { const r = tRank(t.id); if (r) addFx(fx, t.fx, r); }
   for (const ab of abilities()) {
     if (!auraActive(ab)) continue;
@@ -426,7 +432,7 @@ const itemIcon = it => (it.wtype && WEAPON_ICONS[it.wtype]) || (it.otype === 'he
 
 function findItem(id) {
   id = +id;
-  return S.bag.find(i => i.id === id) || SLOTS.map(s => S.equipment[s]).find(i => i && i.id === id);
+  return S.bag.find(i => i.id === id) || SLOTS.map(s => S.equipment[s]).find(i => i && i.id === id) || questRewardItem(id);
 }
 
 function equip(id) {
@@ -567,13 +573,29 @@ function startAbility(ab, st, e) {
   resolveAbility(ab, st);
 }
 
+// ---------- buffs cast from the action bar ----------
+function scaleFx(fx, k) {
+  const out = {};
+  for (const key in fx) out[key] = typeof fx[key] === 'object' ? scaleFx(fx[key], k) : typeof fx[key] === 'number' ? fx[key] * k : fx[key];
+  return out;
+}
+// Potency follows the trained rank and talents (e.g. Improved Battle Shout); same-group buffs (seals, blessings, weapon imbues) replace each other
+function applyManualBuff(ab, left) {
+  const st = calc(), m = st.fx.ab[ab.id] || {};
+  const dur = ab.buff.dur * (1 + (m.dur || 0));
+  if (ab.group) G.buffs = G.buffs.filter(b => !(b.group === ab.group && b.id !== ab.id));
+  addBuff({ id: ab.id, name: abName(ab), icon: ab.icon, left: left != null ? left : dur, max: dur, manual: true, group: ab.group,
+    oneShot: ab.buff.oneShot, fx: scaleFx(ab.buff.fx, rankFactor(ab) * (1 + (m.dmg || 0))) });
+}
+const manualBuffs = () => abilities().filter(a => a.kind === 'buff' && knownRanks(a));
+
 function resolveAbility(ab, st) {
   const e = G.enemy;
   const m = st.fx.ab[ab.id] || {};
   const cost = abCost(ab, st);
   if (poolValue(ab) < cost) return;
   if (isPool(ab) === 'mana') S.mana -= cost; else S.res -= cost;
-  if (ab.cd) G.cds[ab.cdGroup || ab.id] = Math.max(0.5, ab.cd + (m.cd || 0));
+  if (ab.cd) G.cds[ab.cdGroup || ab.id] = G.cdMax[ab.cdGroup || ab.id] = Math.max(0.5, ab.cd + (m.cd || 0));
 
   const rf = rankFactor(ab), H = st.H;
   const cp = S.combo;
@@ -605,7 +627,8 @@ function resolveAbility(ab, st) {
     addBuff({ id: ab.id, name, icon: ab.icon, left: ab.hot.dur, max: ab.hot.dur, hot: { per: total / (ab.hot.dur / 3), every: 3, t: 3 } });
   }
   if (ab.shield) addBuff({ id: ab.id, name, icon: ab.icon, left: 30, max: 30, absorb: H * ab.shield * rf * (1 + (m.dmg || 0)) });
-  if (ab.buff) {
+  if (ab.kind === 'buff') applyManualBuff(ab);
+  else if (ab.buff) {
     const dur = ab.buff.dur * (1 + (m.dur || 0)) + (ab.buff.perCp || 0) * cp;
     addBuff({ id: ab.id, name, icon: ab.icon, left: dur, max: dur, fx: ab.buff.fx, oneShot: ab.buff.oneShot });
   }
@@ -640,6 +663,8 @@ function resolveAbility(ab, st) {
 }
 
 function addCombo(n) { S.combo = Math.min(5, S.combo + n); }
+// Rogues and Cat Form druids keep their combo points between enemies (lost only by spending them or dying)
+const keepsCombo = () => S.cls === 'rogue' || isCat();
 
 // Fights are short, so damage over time is compressed: long DoTs deal their full damage over at most 9 sec.
 function addDot(e, id, name, school, total, dur, every, leech) {
@@ -752,16 +777,19 @@ function spawnEnemy() {
   if (L >= z.min && L <= z.max) lv = clamp(L + randi(-2, 1), z.min, z.max);
   else if (L > z.max) lv = randi(Math.max(z.min, z.max - 3), z.max);
   else lv = randi(z.min, Math.min(z.max, z.min + 3));
-  const elite = Math.random() < CONFIG.ELITE_CHANCE;
+  // A named elite you have a quest for turns up now and then
+  const qdef = Math.random() < QUEST_ELITE_CHANCE ? questEliteDef(z) : null;
+  const elite = !!qdef || Math.random() < CONFIG.ELITE_CHANCE;
   const hpMax = Math.round(enemyHp(lv) * (elite ? 3.2 : 1));
   G.enemy = {
-    def: elite ? pick(z.elites || z.enemies) : pick(z.enemies), lv, elite, hp: hpMax, hpMax,
+    def: qdef || (elite ? pick(z.elites || z.enemies) : pick(z.enemies)), lv, elite, hp: hpMax, hpMax,
     x: G.W + 90, state: 'approach', atk: 1.3, anim: 0, hit: 0, lunge: 0, dying: 0, seed: Math.random() * 10,
     dots: [], stun: 0, opened: false,
   };
   // Wide screens get faster approaches so the walk always takes about the same time
   G.enemy.speed = Math.max(CONFIG.APPROACH_SPEED, (G.enemy.x - fightX()) / 1.1);
-  S.combo = 0; G.procs = {};
+  if (!keepsCombo()) S.combo = 0;
+  G.procs = {};
 }
 
 function enemyAttack(st, e) {
@@ -803,8 +831,9 @@ function killEnemy(e, st) {
   if (fxv(st, 'onKillHeal')) healHero(st.maxHp * fxv(st, 'onKillHeal'), false, true);
   if (xp && Math.random() < fxv(st, 'spiritTap')) addBuff({ id: 'spirit_tap', name: 'Spirit Tap', icon: '👻', left: 15, max: 15, fx: { manaRegen: 1 } });
   if (G.cast && G.cast.needsTarget) G.cast = null;
-  S.combo = 0;
+  if (!keepsCombo()) S.combo = 0;
   if (xp) addXp(xp);
+  questsOnKill(e);
 }
 
 function dropLoot(e) {
@@ -848,12 +877,14 @@ function addXp(n, quiet) {
       fct(G.heroX, G.groundY - 185, 'LEVEL UP!', '#ffe27a', 26);
       burst(G.heroX, G.groundY - 80, '#ffe27a', 30);
       toast(`Ding! You reached level ${S.level}!`);
+      musicDing();
     }
     log(`<b class="ding">Ding! You have reached level ${S.level}!</b>${S.level >= CONFIG.TALENT_START ? ' You gained a talent point.' : ''}`, 'level');
     if (fresh.length && !S.autoTrain) log(`New abilities await at your class trainer: ${fresh.map(a => `<b>${esc(a.name)}</b>`).join(', ')}.`, 'sys');
     if (S.level === 40 && cls().armor[0] !== cls().armor[1]) log(`You can now wear <b>${ARMOR_TYPES[cls().armor[1]].name}</b> armor.`, 'sys');
     if (S.level === CONFIG.LEVEL_CAP) log('<b class="ding">You have reached level 60. Your journey on the Leveling Road is complete!</b>', 'level');
     if (S.autoZone) autoPickZone(quiet);
+    acceptZoneQuests(quiet);
     markDirty();
   }
   return gained;
@@ -862,7 +893,9 @@ function addXp(n, quiet) {
 function autoPickZone(quiet) {
   const best = zonesForChar().filter(z => z.min <= S.level).pop();
   const cur = zone();
-  if (best && best.id !== cur.id && S.level > cur.max - 1) travel(best.id, quiet);
+  // Finish the zone's open quests first, unless they've become trivial
+  const questsLeft = questActive().some(([q, st]) => q.zone === cur.id && !st.done) && S.level < cur.max + 2;
+  if (best && best.id !== cur.id && S.level > cur.max - 1 && !questsLeft) travel(best.id, quiet);
 }
 
 function zoneUnlocked(z) { return S.level >= z.min - 3; }
@@ -871,6 +904,7 @@ function travel(id, quiet) {
   const z = zonesForChar().find(x => x.id === id);
   if (!z || !zoneUnlocked(z) || z.id === S.zoneId) return;
   S.zoneId = z.id;
+  acceptZoneQuests(quiet);
   G.enemy = null; G.spawnTimer = 1; G.weather = []; G.cast = null; G.proj = [];
   showZoneBanner();
   if (!quiet) log(`You travel to <b>${esc(z.name)}</b>.`, 'sys');
@@ -899,8 +933,10 @@ function update(dt) {
     b.left -= dt;
     if (b.hot) { b.hot.t -= dt; if (b.hot.t <= 0 && !G.dead) { b.hot.t += b.hot.every; healHero(b.hot.per); } }
   }
+  for (const b of G.buffs) if (b.manual && b.left <= 0) { uiMessage(`${b.name} has faded`, '#ffd100'); log(`<b>${esc(b.name)}</b> has faded.`, 'sys'); }
   G.buffs = G.buffs.filter(b => b.left > 0 && !(b.absorb !== undefined && b.absorb <= 0));
   if (G.buffs.length !== nb) invalidate();
+  if (G.queued && (G.queueT -= dt) <= 0) G.queued = null;
 
   S.rate.time += dt;
   if (S.rate.time > 900) for (const k in S.rate) S.rate[k] *= 0.5;
@@ -957,6 +993,193 @@ function update(dt) {
   updateFx(dt);
 }
 
+// ---------- casting from the action bar ----------
+// Why an ability can't be cast right now: null = go, 'wait' = after the global cooldown / current cast, otherwise an error to show.
+// Only hard requirements apply here; the rotation's own preferences (heal below 45% health etc.) are ignored.
+function manualBlock(ab, st, e) {
+  if (!ab || !knownRanks(ab)) return 'You haven\'t learned that spell';
+  if (G.dead) return 'You are dead';
+  if (ab.kind && ab.kind !== 'active' && ab.kind !== 'buff') return 'That is a passive ability';
+  if (ab.form === 'cat' && !isCat()) return 'You must be in Cat Form';
+  if (ab.form === 'caster' && isCat()) return 'You can\'t do that while shapeshifted';
+  if ((G.cds[ab.cdGroup || ab.id] || 0) > 0) return 'Ability is not ready yet';
+  if (G.cast || (!ab.nogcd && G.gcd > 0)) return 'wait';
+  if (poolValue(ab) < abCost(ab, st)) return `Not enough ${isPool(ab) === 'mana' ? 'mana' : RESOURCE_NAMES[resType()].toLowerCase()}`;
+  if (needsTarget(ab)) {
+    if (!alive(e)) return 'You have no target';
+    if (!inRange(e) || (e.state !== 'fight' && !ab.range)) return 'Out of range';
+  }
+  if (ab.finisher && S.combo < 1) return 'That ability requires combo points';
+  const c = ab.cond || {};
+  if (c.proc && !(G.procs[c.proc] > 0)) return 'You can\'t do that yet';
+  if (c.targetBelow != null && ['execute', 'hammer_of_wrath'].includes(ab.id) && e.hp / e.hpMax >= c.targetBelow) return 'You can\'t do that yet';
+  if (c.hasDot && !hasDot(e, c.hasDot)) return 'You can\'t do that yet';
+  if (c.hasBuff && !hasBuff(c.hasBuff)) return 'You can\'t do that yet';
+  if (c.ctype && !(alive(e) && c.ctype.includes(e.def.ctype))) return 'Invalid target';
+  if (c.notForm && hasForm(c.notForm)) return 'You can\'t do that in this form';
+  if (c.hasPet && !petKind()) return 'You have no pet';
+  return null;
+}
+
+function pressAbility(id) {
+  if (!S || !id) return;
+  const ab = abById(id);
+  const why = manualBlock(ab, calc(), G.enemy);
+  if (why && why !== 'wait') { uiMessage(why); return; }
+  G.queued = id; G.queueT = 1.6;
+}
+
+// Red error text in the top middle of the screen, like WoW's UIErrorsFrame
+let uiMsgTimer = 0;
+function uiMessage(text, color) {
+  const el = $('#uiError');
+  if (!el) return;
+  el.textContent = text; el.style.color = color || '#ff2020';
+  el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+  clearTimeout(uiMsgTimer); uiMsgTimer = setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+// ---------- action bar ----------
+const BAR_SIZE = 12;
+const BAR_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '='];
+const BAR_CODES = ['Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal'];
+// The action bar holds only buffs; combat spells, cooldowns and racials are cast automatically
+const barCastable = ab => !!ab && ab.kind === 'buff';
+
+// Put known buffs on the bar. Each buff is placed automatically only once (S.barPlaced),
+// so a buff you dragged off stays off, but one that never fit on the bar still gets a slot later.
+function syncBar() {
+  if (!S) return;
+  if (!Array.isArray(S.bar) || S.bar.length !== BAR_SIZE) S.bar = Array.from({ length: BAR_SIZE }, (_, i) => (S.bar || [])[i] || null);
+  // Older saves may hold combat spells: drop them and move the remaining buffs to the front
+  if (S.bar.some(id => id && !barCastable(abById(id)))) {
+    const kept = S.bar.filter(id => id && barCastable(abById(id)));
+    S.bar = Array.from({ length: BAR_SIZE }, (_, i) => kept[i] || null);
+    S.barPlaced = kept;
+  }
+  if (!Array.isArray(S.barPlaced)) S.barPlaced = S.bar.filter(Boolean);
+  const placed = new Set(S.barPlaced);
+  const fresh = abilities().filter(a => barCastable(a) && knownRanks(a) && !placed.has(a.id) && !S.bar.includes(a.id))
+    .sort((a, b) => (a.talent ? 99 : a.learn) - (b.talent ? 99 : b.learn));
+  for (const ab of fresh) {
+    const i = S.bar.indexOf(null);
+    if (i < 0) break;
+    S.bar[i] = ab.id;
+    placed.add(ab.id);
+  }
+  for (const id of S.bar) if (id) placed.add(id);
+  S.barPlaced = [...placed];
+}
+
+const fmtTime = s => s >= 3600 ? Math.ceil(s / 3600) + 'h' : s >= 60 ? Math.ceil(s / 60) + 'm' : Math.ceil(s) + '';
+
+function renderBar() {
+  const el = $('#actionbar');
+  if (!el || !S) return;
+  const key = S.bar.join() + '|' + S.bar.map(id => id && assetNow(spellIconBase(abById(id) || {}) || '') ? 1 : 0).join('');
+  if (G.barKey === key) return;
+  G.barKey = key;
+  el.innerHTML = S.bar.map((id, i) => {
+    const ab = id && abById(id);
+    return `<button class="abtn${ab ? '' : ' empty'}" data-slot="${i}" style="left:${8 + i * 42}px"${ab ? ` data-spell="${id}" draggable="true" aria-label="${esc(abName(ab))}"` : ' aria-label="Empty slot"'}>`
+      + (ab ? spellIconHTML(ab, 'abimg') : '')
+      + `<span class="ab-cd"></span><span class="ab-hl"></span><span class="ab-time"></span><span class="ab-key">${BAR_KEYS[i]}</span></button>`;
+  }).join('');
+}
+
+// Cooldown sweep, resource tint, active-buff highlight and reminders; only touches the DOM when a button's state changes
+function updateBar() {
+  const el = $('#actionbar');
+  if (!el || !S) return;
+  const st = calc(), e = G.enemy;
+  el.querySelectorAll('.abtn[data-spell]').forEach(btn => {
+    const ab = abById(btn.dataset.spell);
+    if (!ab) return;
+    const cdKey = ab.cdGroup || ab.id;
+    const cdRem = G.cds[cdKey] || 0, gcdRem = ab.nogcd ? 0 : G.gcd;
+    const rem = Math.max(cdRem, gcdRem), total = cdRem >= gcdRem ? (G.cdMax[cdKey] || cdRem || 1) : gcdLen();
+    const known = knownRanks(ab) > 0;
+    const buff = ab.kind === 'buff' ? G.buffs.find(b => b.id === ab.id) : null;
+    const why = known ? manualBlock(ab, st, e) : 'unknown';
+    const cls = [
+      !known && 'unknown',
+      known && why && why.startsWith('Not enough') && 'nores',
+      known && why && /range|target/.test(why) && 'oor',
+      buff && 'on',
+      // Only maintenance buffs (no cooldown) pulse when missing; cooldown buffs just show ready / cooling down
+      ab.kind === 'buff' && !ab.cd && known && !buff && !G.dead && 'missing',
+      G.queued === ab.id && 'queued',
+    ].filter(Boolean).join(' ');
+    const deg = rem > 0 ? Math.round(rem / total * 360) : 0;
+    const time = buff ? fmtTime(buff.left) : cdRem >= 1.5 ? fmtTime(cdRem) : '';
+    const sig = cls + '|' + deg + '|' + time;
+    if (btn.dataset.sig === sig) return;
+    btn.dataset.sig = sig;
+    btn.className = 'abtn ' + cls + (btn.classList.contains('pressed') ? ' pressed' : '');
+    btn.style.setProperty('--cd', deg + 'deg');
+    btn.querySelector('.ab-time').textContent = time;
+  });
+}
+
+function scaleBar() {
+  const wrap = $('#actionbarWrap');
+  if (!wrap) return;
+  // Shrink the bar to fit the battlefield's width and the ground strip's height (10% of the battlefield)
+  const stripH = $('#stage').clientHeight * 0.1;
+  wrap.style.setProperty('--abs', Math.min(1, (wrap.clientWidth - 12) / 512, (stripH - 2) / 43).toFixed(3));
+}
+
+function bindBar() {
+  const bar = $('#actionbar');
+  if (!bar) return;
+  // The bar sits on the battlefield; don't let its clicks count as "tap to strike"
+  bar.addEventListener('pointerdown', ev => ev.stopPropagation());
+  bar.addEventListener('click', ev => {
+    const b = ev.target.closest('.abtn');
+    if (b && b.dataset.spell) { pressAbility(b.dataset.spell); flashButton(+b.dataset.slot); }
+  });
+  document.addEventListener('keydown', ev => {
+    if (!S || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test(ev.target.tagName) || !$('#modal').classList.contains('hidden')) return;
+    let i = BAR_CODES.indexOf(ev.code);
+    if (i < 0 && /^Numpad\d$/.test(ev.code)) i = (+ev.code.slice(6) + 9) % 10;
+    if (i < 0) return;
+    ev.preventDefault();
+    flashButton(i);
+    if (S.bar[i]) pressAbility(S.bar[i]);
+  });
+  // Drag spells from the spellbook onto the bar, between slots to swap, or off the bar to remove them
+  document.addEventListener('dragstart', ev => {
+    const b = ev.target.closest && ev.target.closest('.abtn[data-spell]');
+    const row = ev.target.closest && ev.target.closest('[data-drag-spell]');
+    if (b) { ev.dataTransfer.setData('text/plain', 'slot:' + b.dataset.slot); ev.dataTransfer.effectAllowed = 'move'; }
+    else if (row) { ev.dataTransfer.setData('text/plain', 'spell:' + row.dataset.dragSpell); ev.dataTransfer.effectAllowed = 'copy'; }
+  });
+  bar.addEventListener('dragover', ev => { if (ev.target.closest('.abtn')) ev.preventDefault(); });
+  bar.addEventListener('drop', ev => {
+    const b = ev.target.closest('.abtn');
+    if (!b) return;
+    ev.preventDefault();
+    const [kind, v] = (ev.dataTransfer.getData('text/plain') || '').split(':');
+    const i = +b.dataset.slot;
+    if (kind === 'slot') { const j = +v; [S.bar[i], S.bar[j]] = [S.bar[j], S.bar[i]]; G.barDropped = true; }
+    else if (kind === 'spell' && barCastable(abById(v))) { const j = S.bar.indexOf(v); if (j >= 0) S.bar[j] = S.bar[i]; S.bar[i] = v; }
+    G.barKey = null;
+  });
+  bar.addEventListener('dragend', ev => {
+    const b = ev.target.closest('.abtn[data-spell]');
+    if (b && ev.dataTransfer.dropEffect === 'none' && !G.barDropped) { S.bar[+b.dataset.slot] = null; G.barKey = null; }
+    G.barDropped = false;
+  });
+}
+
+function flashButton(i) {
+  const b = document.querySelector(`.abtn[data-slot="${i}"]`);
+  if (!b) return;
+  b.classList.add('pressed');
+  setTimeout(() => b.classList.remove('pressed'), 120);
+}
+
 function heroAct(dt, st, e) {
   G.swing -= dt;
   if (G.cast) {
@@ -967,6 +1190,12 @@ function heroAct(dt, st, e) {
       if (c.t >= c.total) { G.cast = null; resolveAbility(c.ab, st); }
       return;
     }
+  }
+  // A spell pressed on the action bar goes first
+  if (G.queued) {
+    const ab = abById(G.queued), why = manualBlock(ab, st, e);
+    if (!why) { G.queued = null; startAbility(ab, calc(), e); if (G.cast) return; }
+    else if (why !== 'wait') { G.queued = null; uiMessage(why); }
   }
   const list = abilities();
   for (const ab of list) if (ab.nogcd && usable(ab, st, e)) startAbility(ab, calc(), e);
@@ -1131,6 +1360,7 @@ function resize() {
   G.scale = c.height / G.H;
   G.W = c.width / G.scale;
   G.heroX = clamp(G.W * 0.16, 80, 180);
+  scaleBar();
 }
 
 // ---------- HUD ----------
@@ -1175,13 +1405,15 @@ function updateHUD() {
     G.hud.buffs = key;
     $('#buffs').innerHTML = (pet ? `<span class="buff pet" title="${esc(pet.name)}">${pet.kind === 'beast' ? '🐾' : pet.kind === 'imp' ? '👺' : '👤'}</span>` : '') +
       auras.map(a => `<span class="buff" title="${esc(abName(a))}">${spellIconHTML(a)}</span>`).join('') +
-      G.buffs.map(b => `<span class="buff temp" title="${esc(b.name)}">${effectIconHTML(b.id, b.icon)}<i>${Math.ceil(b.left)}</i></span>`).join('');
+      G.buffs.map(b => `<span class="buff temp${b.manual ? ' manual' : ''}" title="${esc(b.name)}">${effectIconHTML(b.id, b.icon)}<i>${fmtTime(b.left)}</i></span>`).join('');
   }
 
   const e = G.enemy;
   const tf = $('#target');
   const show = !!e && !G.dead;
-  if (G.hud.tshow !== show) { G.hud.tshow = show; tf.classList.toggle('hidden', !show); }
+  // Hidden but still taking up room, so the quest tracker below it doesn't jump between enemies
+  if (G.hud.tshow !== show) { G.hud.tshow = show; tf.classList.toggle('vhide', !show); }
+  setHTML('qtrack', $('#qtrack'), questTrackerHTML());
   if (show) {
     setText('tname', $('#tName'), e.def.name);
     const col = conColor(e.lv, S.level);
@@ -1211,6 +1443,7 @@ function showZoneBanner() {
   el.innerHTML = `<div class="zb-name">${esc(z.name)}</div><div class="zb-lv">Levels ${z.min}–${z.max}</div>`;
   el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
   $('#zoneLabel').textContent = z.name;
+  musicSetContext(z.id);
 }
 
 // ---------- log & toast ----------
@@ -1272,7 +1505,13 @@ function abilityDesc(ab, st) {
   const rf = rankFactor(ab), m = st.fx.ab[ab.id] || {}, H = st.H;
   const school = SCHOOL_NAMES[ab.school || 'physical'];
   const parts = [];
-  if (ab.kind === 'aura') {
+  if (ab.kind === 'buff') {
+    const dur = ab.buff.dur * (1 + (m.dur || 0));
+    parts.push(['Instant', ab.cost ? (isPool(ab) === 'mana' ? `${fmt(abCost(ab, st))} Mana` : `${Math.round(abCost(ab, st))} ${RESOURCE_NAMES[resType()]}`) : '', `${dur >= 60 ? dur / 60 + ' min' : dur + ' sec'} duration`,
+      ab.cd && (() => { const cd = Math.max(0.5, ab.cd + (m.cd || 0)); return `${cd >= 60 ? Math.round(cd / 6) / 10 + ' min' : cd + ' sec'} cooldown`; })()].filter(Boolean).join(' · '));
+    parts.push(fxText(ab.buff.fx, rf * (1 + (m.dmg || 0))));
+    parts.push('Cast it from your action bar; it is not cast automatically.');
+  } else if (ab.kind === 'aura') {
     parts.push(fxText(ab.fx, rf * (1 + (m.dmg || 0))) || 'Passive');
   } else if (ab.kind === 'pet') parts.push('Summons a companion that fights with you');
   else if (ab.kind === 'charge') parts.push('Generates rage when a fight begins');
@@ -1339,7 +1578,7 @@ function treeArtStyle(i) {
 function onAssetsChanged() {
   G.hud = {};
   markDirty();
-  if (G.create) renderCreate();
+  if (G.create) renderCreate(); else if (G.select) renderSelect();
 }
 
 function talentTooltipHTML(t) {
@@ -1362,7 +1601,7 @@ function spellTooltipHTML(ab) {
 
 // ---------- panels ----------
 const TABS = [
-  ['character', 'Character', '🛡️'], ['bags', 'Bags', '🎒'], ['spells', 'Spellbook', '📖'], ['talents', 'Talents', '⭐'],
+  ['character', 'Character', '🛡️'], ['bags', 'Bags', '🎒'], ['spells', 'Spellbook', '📖'], ['talents', 'Talents', '⭐'], ['quests', 'Quest Log', '📜'],
   ['professions', 'Professions', '⚒️'], ['zones', 'World Map', '🗺️'], ['log', 'Combat Log', '📋'], ['settings', 'Settings', '⚙️'],
 ];
 
@@ -1375,9 +1614,10 @@ function renderTabs() {
 }
 
 function renderPanel() {
+  if (G.sliding) return;   // don't rebuild the panel under a slider being dragged
   G.dirty = false;
   if (!S) return;
-  const fn = { character: panelCharacter, bags: panelBags, spells: panelSpells, talents: panelTalents, professions: panelProfessions, zones: panelZones, log: panelLog, settings: panelSettings }[G.tab];
+  const fn = { character: panelCharacter, bags: panelBags, spells: panelSpells, talents: panelTalents, quests: panelQuests, professions: panelProfessions, zones: panelZones, log: panelLog, settings: panelSettings }[G.tab];
   $('#panel').innerHTML = fn();
   refreshPanel();
 }
@@ -1418,11 +1658,14 @@ const SHEET_VIEWS = { base: 'Base Stats', melee: 'Melee', ranged: 'Ranged', spel
 const SLOT_TEXTURES = { weapon: 'MainHand', offhand: 'SecondaryHand', head: 'Head', neck: 'Neck', shoulder: 'Shoulder', chest: 'Chest', shirt: 'Shirt', tabard: 'Tabard',
   wrist: 'Wrists', hands: 'Hands', waist: 'Waist', legs: 'Legs', feet: 'Feet', finger1: 'Finger', finger2: 'RFinger', trinket1: 'Trinket', trinket2: 'Trinket' };
 
-// Stone character-frame art behind the model: UI-PaperDollBackground-L1/R1 (top) and -L2/R2 (bottom), 288×512 in total
-function paperDollBg() {
-  const urls = ['L1', 'R1', 'L2', 'R2'].map(p => assetNow(`assets/Interface/PaperDoll/UI-PaperDollBackground-${p}`, TEXTURE_EXTS));
+// Classic dressing-room scene for the race behind the model: DressUpBackground-<Race>1–4 (256×256, 64×256, 256×128, 64×128).
+// The picture fills 318×332 of that 320×384 area; CSS scales the layer up to hide the padding.
+const DRESSUP_RACE = { human: 'Human', dwarf: 'Dwarf', nightelf: 'NightElf', gnome: 'Gnome', orc: 'Orc', undead: 'Scourge', tauren: 'Tauren', troll: 'Troll' };
+function modelBg() {
+  const urls = [1, 2, 3, 4].map(i => assetNow(`assets/Interface/DressUpFrame/DressUpBackground-${DRESSUP_RACE[S.race]}${i}`, TEXTURE_EXTS));
   if (urls.some(u => !u)) return '';
-  return `background-image:${urls.map(u => `url('${u}')`).join(',')};background-size:88.9% 50%,11.1% 50%,88.9% 50%,11.1% 50%;background-position:0 0,100% 0,0 100%,100% 100%;background-repeat:no-repeat;`;
+  // Absolute URLs: relative ones inside a CSS variable would resolve against css/
+  return `--mbg:${urls.map(u => `url('${new URL(u, document.baseURI).href}')`).join(',')};`;
 }
 
 function sheetSlot(s) {
@@ -1480,7 +1723,7 @@ function panelCharacter() {
       </div>
       <div class="wf-body">
         <div class="wf-col">${SHEET_LEFT.map(sheetSlot).join('')}</div>
-        <div class="wf-model${paperDollBg() ? ' pd' : ''}" style="${paperDollBg()}"><canvas id="sheetModel"></canvas>
+        <div class="wf-model${modelBg() ? ' pd' : ''}" style="${modelBg()}"><canvas id="sheetModel"></canvas>
           <div class="wf-res">
             <span title="Health">❤️<b>${fmt(st.maxHp)}</b></span>
             <span title="${RESOURCE_NAMES[st.rt]}">${st.rt === 'mana' ? '🔷' : st.rt === 'rage' ? '💢' : '⚡'}<b>${fmt(st.maxRes)}</b></span>
@@ -1556,9 +1799,12 @@ function panelSpells() {
     else if (next != null && k === 0) status = `<span class="muted">Level ${next}</span>`;
     else if (next != null) status = `<span class="muted">Rank ${k + 1} at ${next}</span>`;
     else status = '<span class="known">Learned</span>';
-    return `<div class="row spell${k ? '' : ' unknown'}" data-spell="${ab.id}">
+    const castable = k && barCastable(ab);
+    const toBar = castable && !S.bar.includes(ab.id) ? `<button class="btn small tobar" data-act="toBar" data-v="${ab.id}" title="Put on the action bar">+ Bar</button>` : '';
+    const tag = ab.kind === 'buff' ? ' · <span class="buffTag">Buff</span>' : ab.kind && ab.kind !== 'active' ? ' · Passive' : '';
+    return `<div class="row spell${k ? '' : ' unknown'}" data-spell="${ab.id}"${castable ? ` data-drag-spell="${ab.id}" draggable="true"` : ''}>
       <div class="ricon">${spellIconHTML(ab, 'rimg')}</div>
-      <div class="rinfo"><div class="rname">${esc(abName(ab))} <span class="muted">${ab.ranks.length > 1 ? `Rank ${k}/${ab.ranks.length}` : ''}${ab.racial ? ' · Racial' : ''}${ab.talent ? ' · Talent' : ''}</span></div>
+      <div class="rinfo"><div class="rname">${esc(abName(ab))} <span class="muted">${ab.ranks.length > 1 ? `Rank ${k}/${ab.ranks.length}` : ''}${ab.racial ? ' · Racial' : ''}${ab.talent ? ' · Talent' : ''}${tag}</span>${toBar}</div>
         <div class="rdesc">${esc(ab.desc || '')}</div></div>
       ${status}
     </div>`;
@@ -1569,7 +1815,7 @@ function panelSpells() {
       <button class="btn primary" data-act="trainAll" ${trainable.length ? '' : 'disabled'}>Train all (${trainable.length})${trainable.length ? ' ' + moneyHTML(total) : ''}</button>
     </div>
     <div class="list">${rows}</div>
-    <p class="muted small">${C.auto === 'wand' ? 'When out of mana, you fall back to shooting your wand. ' : ''}Your rotation uses the first ability in this list that is ready, affordable and useful.</p>`;
+    <p class="muted small">${C.auto === 'wand' ? 'When out of mana, you fall back to shooting your wand. ' : ''}Your rotation casts the first ability in this list that is ready, affordable and useful. Your action bar holds your <b>buffs</b>, which are never cast for you: press them there (keys 1–0, -, =). Combat spells are always cast automatically. Drag buffs onto the bar to rearrange it, or drag them off to remove them.</p>`;
 }
 
 function panelTalents() {
@@ -1641,13 +1887,17 @@ function panelSettings() {
   const opts = ['Nothing', 'Poor items', 'Poor & Common', 'Poor, Common & Uncommon'];
   return `<h3>Settings</h3>
   <div class="settings">
+    ${musicSettingsHTML()}
+    <h4>Game</h4>
     <label>Auto-sell loot below quality:
       <select data-act="autoSell">${opts.map((o, i) => `<option value="${i}" ${S.autoSell === i ? 'selected' : ''}>${o}</option>`).join('')}</select></label>
     <label class="toggle"><input type="checkbox" data-act="numbers" ${S.numbers ? 'checked' : ''}> Show damage numbers</label>
     <label class="toggle"><input type="checkbox" data-act="autoTrain" ${S.autoTrain ? 'checked' : ''}> Automatically train new spell ranks</label>
     <div class="btns">
+      <button class="btn primary" data-act="logout">Character select</button>
       <button class="btn" data-act="saveNow">Save now</button>
-      <button class="btn" data-act="export">Export save</button>
+      <button class="btn" data-act="resetBar">Reset action bar</button>
+      <button class="btn" data-act="export">Export account</button>
       <button class="btn" data-act="import">Import save</button>
       <button class="btn danger" data-act="reset">Delete character</button>
     </div>
@@ -1695,8 +1945,87 @@ function modal(html, buttons) {
 // ---------- character creation ----------
 function randomName(raceId) { return pick(RACES.find(r => r.id === raceId).names); }
 
+// ---------- character select ----------
+function openSelect() {
+  S = null; G.create = null;
+  musicSetContext('select');
+  if (!ACC.characters.length) { openCreate(); return; }
+  const id = ACC.characters.some(c => c.id === ACC.activeId) ? ACC.activeId : ACC.characters[0].id;
+  G.select = { id };
+  previewSelected();
+  $('#create').classList.remove('hidden');
+  document.body.classList.add('creating');
+  renderSelect();
+}
+
+function previewSelected() {
+  const d = loadCharacter(G.select.id);
+  G.select.preview = d ? { race: d.race, cls: d.cls, eq: d.equipment } : null;
+}
+
+function renderSelect() {
+  const sel = ACC.characters.find(c => c.id === G.select.id) || ACC.characters[0];
+  const C = CLASSES[sel.cls], R = RACES.find(r => r.id === sel.race), F = FACTIONS[sel.faction];
+  const zoneName = id => (ZONES.find(z => z.id === id) || {}).name || '';
+  $('#create').className = 'create ' + sel.faction;
+  const rows = ACC.characters.slice().sort((a, b) => b.lastPlayed - a.lastPlayed).map(c => {
+    const k = CLASSES[c.cls], r = RACES.find(x => x.id === c.race);
+    return `<button class="charrow${c.id === sel.id ? ' on' : ''}" data-c="pick" data-v="${c.id}">
+      <span class="cr-i">${classIconHTML(c.cls, 'cp-img')}</span>
+      <span class="cr-t"><b style="color:${k.color}">${esc(c.name)}</b><span>Level ${c.level} ${r.name} ${k.name}</span><span class="muted">${esc(zoneName(c.zoneId))}</span></span></button>`;
+  }).join('');
+  const legacy = accountFx().xp;
+  $('#create').innerHTML = `<div class="cbox">
+    <div class="ctitle">⚔️ The Leveling Road</div>
+    <div class="csub">Select your character</div>
+    <div class="cgrid">
+      <div class="cleft">
+        <div class="clabel">Characters <span class="muted">${ACC.characters.length}</span></div>
+        <div class="charlist">${rows}</div>
+        <div class="btns sel-btns">
+          <button class="btn" data-c="newChar">Create New Character</button>
+          <button class="btn danger" data-c="deleteChar">Delete Character</button>
+        </div>
+        ${legacy ? `<p class="muted small">Legacy: every character earns +${Math.round(legacy * 100)}% experience thanks to your level ${CONFIG.LEVEL_CAP} characters.</p>` : ''}
+      </div>
+      <div class="cright">
+        <canvas id="preview" class="preview"></canvas>
+        <div class="cinfo">
+          <div class="cin-title">${classIconHTML(sel.cls, 'inline big')} <span style="color:${C.color}">${esc(sel.name)}</span></div>
+          <div class="cin-row"><b>Level ${sel.level}</b> ${R.name} ${C.name}</div>
+          <div class="cin-row"><b>Location</b> ${esc(zoneName(sel.zoneId))}</div>
+          <div class="cin-row"><b>Last played</b> ${new Date(sel.lastPlayed).toLocaleString()}</div>
+        </div>
+        <button class="btn primary enter" data-c="enterChar" style="--fc:${F.color}">Enter World</button>
+      </div>
+    </div>
+  </div>`;
+  sizePreview();
+}
+
+function enterCharacter(id) {
+  const d = loadCharacter(id);
+  if (!d) { toast('That character could not be loaded.'); return; }
+  applySave(d);
+  S.charId = id; ACC.activeId = id; saveAccount();
+  G.select = null; G.create = null; G.tab = 'character'; G.tree = 0; G.talSel = null; G.hud = {};
+  $('#create').classList.add('hidden'); document.body.classList.remove('creating');
+  if (S.autoTrain) autoTrain();
+  acceptZoneQuests(true);
+  renderTabs(); showZoneBanner(); markDirty();
+  applyOffline((Date.now() - S.lastSeen) / 1000);
+}
+
+function leaveWorld() {
+  save();
+  S = null; resetRuntime();
+  openSelect();
+}
+
 function openCreate() {
   const r = RACES[0];
+  G.select = null;
+  musicSetContext('select');
   G.create = { faction: r.faction, race: r.id, cls: r.classes[0], name: randomName(r.id) };
   $('#create').classList.remove('hidden');
   document.body.classList.add('creating');
@@ -1736,7 +2065,8 @@ function renderCreate() {
           <div class="cin-row"><b>Starts in</b> ${esc(startZone.name)}</div>
         </div>
         <div class="cname"><input id="cName" maxlength="12" value="${esc(c.name)}" aria-label="Character name" autocomplete="off" spellcheck="false"><button class="btn" data-c="dice" title="Random name">🎲</button></div>
-        <button class="btn primary enter" data-c="enter" style="--fc:${F.color}">Enter World</button>
+        <button class="btn primary enter" data-c="enter" style="--fc:${F.color}">Create Character</button>
+        ${ACC.characters.length ? '<button class="btn back" data-c="back">← Back to character select</button>' : ''}
       </div>
     </div>
   </div>`;
@@ -1752,8 +2082,10 @@ function sizePreview() {
 
 function drawPreview(t) {
   const cv = $('#preview');
-  if (!cv || !G.create) return;
-  const ctx = cv.getContext('2d'), c = G.create;
+  // Character creation previews the chosen race/class; character select previews the saved character in their gear
+  const c = G.create || (G.select && G.select.preview);
+  if (!cv || !c) return;
+  const ctx = cv.getContext('2d');
   const R = RACES.find(r => r.id === c.race), z = ZONES.find(x => x.id === R.start), p = z.palette;
   const H = 220, s = cv.height / H, W = cv.width / s;
   ctx.setTransform(s, 0, 0, s, 0, 0);
@@ -1763,7 +2095,7 @@ function drawPreview(t) {
   hills(ctx, W, t * 6, 150, 14, p.far, 166, 1);
   ctx.fillStyle = p.ground; ctx.fillRect(0, 164, W, H);
   const C0 = CLASSES[c.cls], ow = C0.offhands[0];
-  const eq = { weapon: { wtype: C0.look.weapon, q: 3, ilvl: 30 }, head: 1, chest: 1, hands: 1, legs: 1, feet: 1, shoulder: 1, waist: 1,
+  const eq = c.eq || { weapon: { wtype: C0.look.weapon, q: 3, ilvl: 30 }, head: 1, chest: 1, hands: 1, legs: 1, feet: 1, shoulder: 1, waist: 1,
     offhand: ow && WEAPON_TYPES[C0.look.weapon].hands === 1 ? (WEAPON_TYPES[ow] ? { wtype: ow, q: 3 } : { otype: ow, q: 3 }) : null };
   const look = lookFor(c.race, c.cls, eq);
   const sw = (t % 3.2) / 0.9;
@@ -1781,23 +2113,21 @@ function drawSheetModel() {
   const w = Math.max(1, Math.round(r.width * dpr)), h = Math.max(1, Math.round(r.height * dpr));
   if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
   const ctx = cv.getContext('2d');
-  // With the stone frame art (288×512 units) the hero stands in its black window; otherwise on a dark backdrop
+  // On the race scene the canvas is transparent and the hero stands near the bottom; otherwise on a dark backdrop
   const pd = cv.parentElement.classList.contains('pd');
-  const H = pd ? 512 : 230, s = h / H, W = w / s;
-  const cx = pd ? 169 : W / 2 - 4, feet = pd ? 340 : 200, scale = pd ? 1.45 : 1.15;
+  const H = 230, s = h / H, W = w / s;
+  const cx = W / 2 - 4, feet = pd ? 212 : 200, scale = pd ? 1.2 : 1.15;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clearRect(0, 0, w, h);
   ctx.setTransform(s, 0, 0, s, 0, 0);
   if (pd) {
-    const g = ctx.createRadialGradient(cx, feet - 110, 10, cx, feet - 110, 160);
-    g.addColorStop(0, 'rgba(90,80,70,0.35)'); g.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = g; ctx.fillRect(60, 75, 218, 287);
+    ctx.fillStyle = 'rgba(0,0,0,0.35)'; ell(ctx, cx, feet, 60, 9);
   } else {
     const g = ctx.createRadialGradient(W / 2, H * 0.55, 10, W / 2, H * 0.55, W * 0.8);
     g.addColorStop(0, '#3a3530'); g.addColorStop(1, '#0c0b0a');
     ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = 'rgba(255,255,255,0.05)'; ell(ctx, cx, feet, 70, 10);
   }
-  ctx.fillStyle = 'rgba(255,255,255,0.05)'; ell(ctx, cx, feet, 70, 10);
   const t = G.t;
   if (isCat()) drawCatForm(ctx, cx + 10, feet, t, false, -1, 0, { race: S.race });
   else drawCharacter(ctx, cx, feet, t, { walking: false, swing: -1, hurt: 0, ranged: S.cls === 'hunter', shoot: 0, cast: null, scale }, lookFor(S.race, S.cls, S.equipment));
@@ -1812,18 +2142,22 @@ function enterWorld() {
   Object.assign(S, { name, faction: c.faction, race: c.race, cls: c.cls, welcomed: true });
   resetRuntime();
   S.zoneId = race().start;
+  addCharacter(S);
   giveStarterGear();
   for (const ab of abilities()) if (!ab.talent && ab.learn <= 1) S.spells[ab.id] = 1;
+  syncBar(); G.barKey = null;
   invalidate();
   const st = calc(); S.hp = st.maxHp; S.mana = st.maxMana; S.res = st.rt === 'energy' ? 100 : 0;
   G.create = null; G.tab = 'character'; G.tree = 0; G.talSel = null; G.hud = {};
   $('#create').classList.add('hidden'); document.body.classList.remove('creating');
   log(`${esc(name)} the ${race().name} ${cls().name} begins their journey in <b>${esc(zone().name)}</b>.`, 'sys');
+  acceptZoneQuests();
   save();
   renderTabs(); showZoneBanner(); markDirty();
   const F = FACTIONS[S.faction];
   modal(`<h3>${factionIconHTML(S.faction, 'inl')} ${F.motto}</h3>
     <p>Welcome, <b style="color:${cls().color}">${esc(name)}</b>. Your ${cls().name.toLowerCase()} fights on their own. Enemies march in from the east, and every kill brings experience, gold and the chance of loot.</p>
+    <p><b>Buff yourself!</b> Your class buffs sit on the action bar under the battlefield. Click them or press <b>1–0</b>; a glowing button is a buff you are missing. Buffs are never cast for you, and they fade with time and when you die.</p>
     <p><b>Tap or click the battlefield</b> to strike faster. Learn new ranks in your <b>Spellbook</b>, equip loot from your <b>Bags</b>, train <b>Professions</b> and spend <b>Talents</b> from level 10.</p>
     <p class="muted">Reach level 60 and conquer the Burning Steppes.</p>`, [['Begin the grind', null, 'primary']]);
 }
@@ -1834,6 +2168,17 @@ const CREATE_ACTIONS = {
   class(v) { G.create.cls = v; },
   dice() { G.create.name = randomName(G.create.race); },
   enter() { enterWorld(); },
+  back() { openSelect(); },
+  // character select
+  pick(v) { G.select.id = +v; previewSelected(); },
+  enterChar() { enterCharacter(G.select.id); },
+  newChar() { openCreate(); },
+  deleteChar() {
+    const c = ACC.characters.find(x => x.id === G.select.id);
+    if (!c) return;
+    modal(`<h3>Delete ${esc(c.name)}?</h3><p>Level ${c.level} ${RACES.find(r => r.id === c.race).name} ${CLASSES[c.cls].name}. This permanently erases this character.</p>`, [
+      ['Delete', () => { deleteCharacter(c.id); openSelect(); }, 'danger'], ['Cancel']]);
+  },
 };
 
 // ---------- actions ----------
@@ -1854,12 +2199,15 @@ const ACTIONS = {
     G.talSel = id;
     if (canLearnTalent(t)) {
       S.talents[id] = tRank(id) + 1;
+      GRANTS = null; syncBar();
       if (t.fx.grants && tRank(id) === 1) { const ab = abById(t.fx.grants); if (ab) log(`You have learned a new ability: <b>${ab.icon} ${esc(ab.name)}</b>.`, 'sys'); }
       invalidate();
     }
     markDirty();
   },
   tree(i) { G.tree = +i; markDirty(); },
+  toBar(id) { const i = S.bar.indexOf(null); if (i < 0) { toast('Your action bar is full. Drag a spell off it first.'); return; } S.bar[i] = id; G.barKey = null; markDirty(); },
+  resetBar() { S.bar = Array(BAR_SIZE).fill(null); S.barPlaced = []; syncBar(); G.barKey = null; toast('Action bar reset.'); },
   sheetView(side, el) { G['sheet' + side] = el.value; markDirty(); },
   resetTalents() {
     modal('<h3>Reset talents?</h3><p>All talent points will be refunded. (Unlike a real class trainer, this is free.)</p>', [['Reset', () => { S.talents = {}; G.cast = null; invalidate(); markDirty(); }, 'danger'], ['Cancel']]);
@@ -1869,6 +2217,19 @@ const ACTIONS = {
   numbers(v, el) { S.numbers = el.checked; },
   autoTrain(v, el) { S.autoTrain = el.checked; if (S.autoTrain) autoTrain(); markDirty(); },
   autoSell(v, el) { S.autoSell = +el.value; },
+  musicVolume(v, el) { musicSetVolume(el.value / 100); const t = $('#volText'); if (t) t.textContent = el.value + '%'; },
+  musicMute(v, el) { musicToggleMute(el.checked); },
+  musicUnfocused(v, el) { musicSetUnfocused(el.checked); },
+  musicSkip() { musicSkip(); },
+  autoQuest(v, el) {
+    S.autoQuest = el.checked;
+    if (S.autoQuest) for (const [q, st] of questActive()) if (st.done) turnInQuest(q.id, bestQuestReward(st.rewards));
+    markDirty();
+  },
+  questSel(id) { G.questSel = id; G.questChoice = 0; markDirty(); },
+  questChoice(i) { G.questChoice = +i; markDirty(); },
+  questTurnIn(id) { turnInQuest(id, G.questChoice || 0); G.questChoice = 0; },
+  questAbandon(id) { modal(`<h3>Abandon quest?</h3><p>Abandon <b>${esc(questById(id).name)}</b>? It will be offered again the next time you are in its zone.</p>`, [['Abandon', () => abandonQuest(id), 'danger'], ['Cancel']]); },
   select(id) { G.selected = G.selected === +id ? null : +id; markDirty(); },
   equip(id) { equip(id); },
   sell(id) { sellItem(id); },
@@ -1879,24 +2240,26 @@ const ACTIONS = {
   saveNow() { save(); toast('Game saved.'); },
   export() {
     save();
-    const code = btoa(unescape(encodeURIComponent(JSON.stringify(S))));
-    modal(`<h3>Export save</h3><p>Copy this code somewhere safe.</p><textarea readonly id="exportBox">${code}</textarea>`, [
+    const code = exportAccount();
+    modal(`<h3>Export account</h3><p>This code holds all your characters and account progress. Copy it somewhere safe.</p><textarea readonly id="exportBox">${code}</textarea>`, [
       ['Copy', () => { navigator.clipboard?.writeText(code).then(() => toast('Copied!')).catch(() => {}); return false; }, 'primary'], ['Close']]);
     setTimeout(() => $('#exportBox')?.select(), 50);
   },
   import() {
-    modal('<h3>Import save</h3><p>Paste a save code. This replaces your current character.</p><textarea id="importBox"></textarea>', [
+    modal('<h3>Import save</h3><p>Paste an account code to replace this account, or an old single-character code to add that character.</p><textarea id="importBox"></textarea>', [
       ['Import', () => {
         try {
-          const d = JSON.parse(decodeURIComponent(escape(atob($('#importBox').value.trim()))));
-          if (!validSave(d)) throw new Error('bad');
-          applySave(d); save(); G.hud = {}; renderTabs(); showZoneBanner(); markDirty(); toast('Save imported!');
+          save();
+          const kind = importAccount($('#importBox').value);
+          S = null; resetRuntime(); openSelect();
+          toast(kind === 'account' ? 'Account imported!' : 'Character added!');
         } catch (e) { toast('That save code is not valid.'); return false; }
       }, 'primary'], ['Cancel']]);
   },
+  logout() { leaveWorld(); },
   reset() {
-    modal('<h3>Delete character?</h3><p>This permanently erases all progress in this browser.</p>', [
-      ['Delete', () => { localStorage.removeItem(CONFIG.SAVE_KEY); S = null; resetRuntime(); openCreate(); }, 'danger'], ['Cancel']]);
+    modal(`<h3>Delete ${esc(S.name)}?</h3><p>This permanently erases this character. Your other characters and account progress are kept.</p>`, [
+      ['Delete', () => { deleteCharacter(S.charId); S = null; resetRuntime(); openSelect(); }, 'danger'], ['Cancel']]);
   },
 };
 
@@ -1953,6 +2316,8 @@ function frame(ts) {
   update(dt);
   draw();
   updateHUD();
+  renderBar();
+  updateBar();
   if (G.dirty) renderPanel();
   G.refreshT += dt;
   if (G.refreshT > 0.25) { G.refreshT = 0; refreshPanel(); }
@@ -1970,12 +2335,16 @@ function boot() {
   G.ctx = G.canvas.getContext('2d');
   document.title = CONFIG.GAME_NAME;
   applyUiAssets();
-  const existing = load();
+  load();
+  initMusic();
   resize();
+  scaleBar();
   new ResizeObserver(resize).observe(G.canvas);
   window.addEventListener('resize', sizePreview);
   renderTabs();
   bindTooltip();
+  bindBar();
+  window.addEventListener('resize', scaleBar);
 
   $('#tabs').addEventListener('click', ev => {
     const b = ev.target.closest('[data-tab]');
@@ -1994,13 +2363,21 @@ function boot() {
     const el = ev.target.closest('[data-act]');
     if (el) ACTIONS[el.dataset.act]?.(el.dataset.v, el, ev);
   });
+  // Sliders update live while dragging
+  panel.addEventListener('pointerdown', ev => { if (ev.target.type === 'range') G.sliding = true; });
+  window.addEventListener('pointerup', () => { G.sliding = false; });
+  window.addEventListener('pointercancel', () => { G.sliding = false; });
+  panel.addEventListener('input', ev => {
+    const el = ev.target.closest('input[type="range"][data-act]');
+    if (el) ACTIONS[el.dataset.act]?.(el.dataset.v, el, ev);
+  });
   $('#create').addEventListener('click', ev => {
     const el = ev.target.closest('[data-c]');
-    if (!el || el.disabled || !G.create) return;
-    const nameEl = $('#cName'); if (nameEl) G.create.name = nameEl.value;
+    if (!el || el.disabled || !(G.create || G.select)) return;
+    const nameEl = $('#cName'); if (nameEl && G.create) G.create.name = nameEl.value;
     CREATE_ACTIONS[el.dataset.c]?.(el.dataset.v);
     if (S) return;
-    renderCreate();
+    if (G.create) renderCreate(); else if (G.select) renderSelect();
   });
   $('#create').addEventListener('keydown', ev => { if (ev.key === 'Enter' && ev.target.id === 'cName') enterWorld(); });
   $('#stage').addEventListener('pointerdown', tap);
@@ -2013,11 +2390,8 @@ function boot() {
   });
   window.addEventListener('pagehide', save);
 
-  if (existing) {
-    if (S.autoTrain) autoTrain();
-    showZoneBanner();
-    applyOffline((Date.now() - S.lastSeen) / 1000);
-  } else openCreate();
+  // Start at the character select screen (or character creation for a new account)
+  openSelect();
 
   if (/[?&]debug/.test(location.search)) {
     window.dbg = {

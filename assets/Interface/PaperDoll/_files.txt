@@ -1,10 +1,6 @@
 Files the game looks for in this folder (see ASSETS.md for sources):
 
 UI-Backpack-EmptySlot.png
-UI-PaperDollBackground-L1.png
-UI-PaperDollBackground-R1.png
-UI-PaperDollBackground-L2.png
-UI-PaperDollBackground-R2.png
 UI-PaperDoll-Slot-Head.png
 UI-PaperDoll-Slot-Neck.png
 UI-PaperDoll-Slot-Shoulder.png

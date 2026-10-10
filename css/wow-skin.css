@@ -109,10 +109,11 @@ img.cf-img { width: 30px; height: 30px; border-radius: 5px; }
   background: var(--a-dialogHeader) center top / 256px 64px no-repeat; position: relative; z-index: 2; }
 
 /* ---------- tooltips and inner boxes ---------- */
-.has-tooltipBorderNine .tooltip, .has-tooltipBorderNine .detail, .has-tooltipBorderNine .sidecard, .has-tooltipBorderNine .wstat {
+.has-tooltipBorderNine .detail, .has-tooltipBorderNine .sidecard, .has-tooltipBorderNine .wstat {
   position: relative; border-color: transparent; border-radius: 0;
 }
-.has-tooltipBorderNine .tooltip { background: rgba(0,0,0,.85); }
+/* The tooltip keeps its own position: fixed (it follows the cursor); only the border and background change */
+.has-tooltipBorderNine .tooltip { background: rgba(0,0,0,.85); border-color: transparent; border-radius: 0; }
 .has-tooltipBorderNine .tooltip::before, .has-tooltipBorderNine .detail::before, .has-tooltipBorderNine .sidecard::before, .has-tooltipBorderNine .wstat::before {
   content: ''; position: absolute; inset: -3px; pointer-events: none;
   border-style: solid; border-width: calc(var(--a-tooltipBorderEdge) * 1px); border-color: transparent;
@@ -156,6 +157,19 @@ img.cf-img { width: 30px; height: 30px; border-radius: 5px; }
 .has-bagSlot .cell { background: var(--a-bagSlot) center / 100% 100% no-repeat; border-color: #000; }
 .sslot.empty.tex { font-size: 0; opacity: 1; filter: none; background-size: 100% 100%; border-color: #000; }
 
+/* ---------- action bar: UI-MainMenuBar strips (256×43 each) and UI-Quickslot button frames ---------- */
+.has-mainBar .actionbar { border: 0; border-radius: 0; box-shadow: none;
+  background: var(--a-mainBar) 0 -213px / 256px 256px no-repeat, var(--a-mainBar) 256px -149px / 256px 256px no-repeat; }
+.has-quickslot .abtn { border: 0; border-radius: 0; background: transparent; }
+.has-quickslot .abtn::after { content: ''; position: absolute; left: -15px; top: -15px; width: 66px; height: 66px; z-index: 3; pointer-events: none; background: var(--a-quickslot) 0 0 / 100% 100% no-repeat; }
+.has-quickslotDown .abtn.pressed::after, .has-quickslotDown .abtn.queued::after, .has-quickslotDown .abtn:active::after { left: 0; top: 0; width: 36px; height: 36px; background-image: var(--a-quickslotDown); }
+.has-quickslotDown .abtn.pressed, .has-quickslotDown .abtn.queued { transform: none; filter: none; }
+.has-btnHilight .abtn:hover:not(.empty) .ab-hl { background: var(--a-btnHilight) 0 0 / 100% 100%; mix-blend-mode: screen; }
+.has-checkHilight .abtn.on .ab-hl { box-shadow: none; background: var(--a-checkHilight) 0 0 / 100% 100%; mix-blend-mode: screen; }
+
 /* ---------- character creation: faction loading screens ---------- */
 .has-loadAlliance .create.alliance { background: linear-gradient(rgba(0,0,0,.35), rgba(0,0,0,.8)), var(--a-loadAlliance) center / cover no-repeat; }
 .has-loadHorde .create.horde { background: linear-gradient(rgba(0,0,0,.35), rgba(0,0,0,.8)), var(--a-loadHorde) center / cover no-repeat; }
+
+/* ---------- quest log: QuestBG parchment (the page fills 300×335 of the 512×512 texture) ---------- */
+.has-questBg .qdetail { background: var(--a-questBg) 0 0 / 170.67% 152.84% no-repeat; box-shadow: none; }

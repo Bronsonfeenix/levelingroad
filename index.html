@@ -21,6 +21,7 @@
         <div class="xpbar"><div class="xpfill" id="xpFill"></div><div class="xptext" id="xpText"></div></div>
       </div>
       <div class="money" id="money"></div>
+      <button class="mutebtn" id="muteBtn" type="button" aria-label="Mute music">🔊</button>
     </header>
 
     <!-- Battlefield: hero on the left, enemies approach from the right -->
@@ -42,7 +43,7 @@
       </div>
 
       <div class="hudright">
-        <div class="frame target hidden" id="target">
+        <div class="frame target vhide" id="target">
           <div class="bars">
             <div class="fname"><span id="tName"></span> <span class="elitetag">Elite</span></div>
             <div class="bar hp"><div class="fill" id="tHp"></div><span id="tHpText"></span></div>
@@ -51,16 +52,21 @@
           <div class="portrait"><canvas id="tPortrait" width="128" height="128"></canvas><span class="lvl" id="tLevel">1</span></div>
         </div>
         <div class="buffs right" id="tDebuffs"></div>
+        <div class="qtrack" id="qtrack"></div>
       </div>
 
       <div class="zonelabel" id="zoneLabel"></div>
       <div class="zonebanner" id="zoneBanner"></div>
       <div class="taphint" id="tapHint">Tap to strike!</div>
+      <div class="uierror" id="uiError"></div>
+      <!-- Action bar: click or press 1–0, -, = -->
+      <div class="actionbar-wrap" id="actionbarWrap"><div class="actionbar" id="actionbar"></div></div>
       <div class="death hidden" id="death">
         <div class="dtitle">You have died</div>
         <div class="dsub">Releasing spirit… returning from the Spirit Healer in <span id="deathTimer">6</span></div>
       </div>
     </section>
+
 
     <!-- Menus -->
     <nav class="tabs" id="tabs"></nav>
@@ -79,6 +85,9 @@
   <script src="js/talents.js"></script>
   <script src="js/render.js"></script>
   <script src="js/assets.js"></script>
+  <script src="js/account.js"></script>
+  <script src="js/quests.js"></script>
+  <script src="js/music.js"></script>
   <script src="js/game.js"></script>
 </body>
 </html>

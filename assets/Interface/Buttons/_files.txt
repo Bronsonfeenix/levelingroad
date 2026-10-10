@@ -4,3 +4,7 @@ UI-Panel-Button-Up.png
 UI-Panel-Button-Down.png
 UI-Panel-Button-Disabled.png
 UI-EmptySlot-Disabled.png
+UI-Quickslot2.png
+UI-Quickslot-Depress.png
+ButtonHilight-Square.png
+CheckButtonHilight.png

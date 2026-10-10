@@ -25,18 +25,25 @@ const UI_ASSETS = {
   bagSlotAlt:    'assets/Interface/Buttons/UI-EmptySlot-Disabled',
   bagSlot:       'assets/Interface/PaperDoll/UI-Backpack-EmptySlot',
   // Empty equipment slots use assets/Interface/PaperDoll/UI-PaperDoll-Slot-<Slot> (see SLOT_TEXTURES in game.js)
+  mainBar:       'assets/Interface/MainMenuBar/UI-MainMenuBar-Dwarf',
+  quickslot:     'assets/Interface/Buttons/UI-Quickslot2',
+  quickslotDown: 'assets/Interface/Buttons/UI-Quickslot-Depress',
+  btnHilight:    'assets/Interface/Buttons/ButtonHilight-Square',
+  checkHilight:  'assets/Interface/Buttons/CheckButtonHilight',
   gold:          'assets/Interface/MoneyFrame/UI-GoldIcon',
   silver:        'assets/Interface/MoneyFrame/UI-SilverIcon',
   copper:        'assets/Interface/MoneyFrame/UI-CopperIcon',
   loadAlliance:  'assets/Interface/Glues/LoadingScreens/LoadScreenEasternKingdom',
   loadHorde:     'assets/Interface/Glues/LoadingScreens/LoadScreenKalimdor',
+  questBg:       'assets/Interface/QuestFrame/QuestBG',
 };
 const TEXTURE_EXTS = ['.png', '.PNG', '.jpg'];
 const ICON_EXTS = ['.jpg', '.png'];
 
 // Backdrop edge files hold 8 square pieces side by side: left, right, top, bottom, then the 4 corners.
-// The top and bottom pieces are stored upright and rotated into place.
-const BACKDROP_ROTATION = { top: Math.PI / 2, bottom: -Math.PI / 2 };
+// The top and bottom pieces are stored as vertical strips: the top one like the left edge (lines on the left),
+// the bottom one like the right edge (lines on the right). Rotating both clockwise puts the lines on the outside.
+const BACKDROP_ROTATION = { top: Math.PI / 2, bottom: Math.PI / 2 };
 
 const ASSET_CACHE = {};  // base path -> url | false | Promise
 const encodePath = p => p.split('/').map(encodeURIComponent).join('/');

@@ -19,47 +19,82 @@ File names are case-sensitive on GitHub Pages, so keep the capitalisation shown 
 | File in this project | Used for | Source |
 | --- | --- | --- |
 | `assets/fonts/FRIZQT__.TTF` | Font for all text (Friz Quadrata) | [wago.tools: fonts/frizqt__.ttf](https://wago.tools/files) (game client, ``Fonts`` folder) |
-| `assets/Interface/FrameGeneral/UI-Background-Rock.png` | Page background | [FrameGeneral/UI-Background-Rock](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/framegeneral/ui-background-rock.blp` |
-| `assets/Interface/DialogFrame/UI-DialogBox-Background.png` | Panel, dialog, creation screen and character sheet background | [DialogFrame/UI-DialogBox-Background](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/dialogframe/ui-dialogbox-background.blp` |
-| `assets/Interface/DialogFrame/UI-DialogBox-Border.png` | Gold/grey dialog border | [DialogFrame/UI-DialogBox-Border](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/dialogframe/ui-dialogbox-border.blp` |
-| `assets/Interface/DialogFrame/UI-DialogBox-Header.png` | Title plate on dialogs | [DialogFrame/UI-DialogBox-Header](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/dialogframe/ui-dialogbox-header.blp` |
-| `assets/Interface/Tooltips/UI-Tooltip-Border.png` | Tooltip border, inner boxes | [Tooltips/UI-Tooltip-Border](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/tooltips/ui-tooltip-border.blp` |
-| `assets/Interface/TargetingFrame/UI-TargetingFrame.png` | Player and target unit frames | [TargetingFrame/UI-TargetingFrame](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/targetingframe/ui-targetingframe.blp` |
-| `assets/Interface/TargetingFrame/UI-TargetingFrame-Elite.png` | Gold dragon frame for elites | [TargetingFrame/UI-TargetingFrame-Elite](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/targetingframe/ui-targetingframe-elite.blp` |
-| `assets/Interface/TargetingFrame/UI-StatusBar.png` | Health, mana, rage, energy, XP and cast bar fill | [TargetingFrame/UI-StatusBar](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/targetingframe/ui-statusbar.blp` |
-| `assets/Interface/CastingBar/UI-CastingBar-Border.png` | Cast bar border | [CastingBar/UI-CastingBar-Border](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/castingbar/ui-castingbar-border.blp` |
-| `assets/Interface/Buttons/UI-Panel-Button-Up.png` | Red buttons | [Buttons/UI-Panel-Button-Up](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/buttons/ui-panel-button-up.blp` |
-| `assets/Interface/Buttons/UI-Panel-Button-Down.png` | Pressed buttons | [Buttons/UI-Panel-Button-Down](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/buttons/ui-panel-button-down.blp` |
-| `assets/Interface/Buttons/UI-Panel-Button-Disabled.png` | Disabled buttons | [Buttons/UI-Panel-Button-Disabled](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/buttons/ui-panel-button-disabled.blp` |
-| `assets/Interface/PaperDollInfoFrame/UI-Character-ActiveTab.png` | Selected menu tab | [PaperDollInfoFrame/UI-Character-ActiveTab](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/paperdollinfoframe/ui-character-activetab.blp` |
-| `assets/Interface/PaperDollInfoFrame/UI-Character-InActiveTab.png` | Other menu tabs | [PaperDollInfoFrame/UI-Character-InActiveTab](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/paperdollinfoframe/ui-character-inactivetab.blp` |
-| `assets/Interface/PaperDoll/UI-Backpack-EmptySlot.png` | Bag slots | [PaperDoll/UI-Backpack-EmptySlot](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-backpack-emptyslot.blp` |
-| `assets/Interface/Buttons/UI-EmptySlot-Disabled.png` | Bag slots (used if UI-Backpack-EmptySlot is missing) | [Buttons/UI-EmptySlot-Disabled](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/buttons/ui-emptyslot-disabled.blp` |
-| `assets/Interface/PaperDoll/UI-PaperDollBackground-L1.png` | Stone character frame behind the model (top left) | [PaperDoll/UI-PaperDollBackground-L1](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdollbackground-l1.blp` |
-| `assets/Interface/PaperDoll/UI-PaperDollBackground-R1.png` | Stone character frame (top right) | [PaperDoll/UI-PaperDollBackground-R1](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdollbackground-r1.blp` |
-| `assets/Interface/PaperDoll/UI-PaperDollBackground-L2.png` | Stone character frame (bottom left) | [PaperDoll/UI-PaperDollBackground-L2](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdollbackground-l2.blp` |
-| `assets/Interface/PaperDoll/UI-PaperDollBackground-R2.png` | Stone character frame (bottom right) | [PaperDoll/UI-PaperDollBackground-R2](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdollbackground-r2.blp` |
-| `assets/Interface/MoneyFrame/UI-GoldIcon.png` | Gold coin | [MoneyFrame/UI-GoldIcon](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/moneyframe/ui-goldicon.blp` |
-| `assets/Interface/MoneyFrame/UI-SilverIcon.png` | Silver coin | [MoneyFrame/UI-SilverIcon](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/moneyframe/ui-silvericon.blp` |
-| `assets/Interface/MoneyFrame/UI-CopperIcon.png` | Copper coin | [MoneyFrame/UI-CopperIcon](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/moneyframe/ui-coppericon.blp` |
-| `assets/Interface/Glues/LoadingScreens/LoadScreenEasternKingdom.png` | Character creation background (Alliance) | [Glues/LoadingScreens/LoadScreenEasternKingdom](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/glues/loadingscreens/loadscreeneasternkingdom.blp` |
-| `assets/Interface/Glues/LoadingScreens/LoadScreenKalimdor.png` | Character creation background (Horde) | [Glues/LoadingScreens/LoadScreenKalimdor](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/glues/loadingscreens/loadscreenkalimdor.blp` |
-| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-Head.png` | Empty Head slot | [PaperDoll/UI-PaperDoll-Slot-Head](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-head.blp` |
-| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-Neck.png` | Empty Neck slot | [PaperDoll/UI-PaperDoll-Slot-Neck](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-neck.blp` |
-| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-Shoulder.png` | Empty Shoulder slot | [PaperDoll/UI-PaperDoll-Slot-Shoulder](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-shoulder.blp` |
-| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-Chest.png` | Empty Chest slot | [PaperDoll/UI-PaperDoll-Slot-Chest](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-chest.blp` |
-| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-Shirt.png` | Empty Shirt slot | [PaperDoll/UI-PaperDoll-Slot-Shirt](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-shirt.blp` |
-| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-Tabard.png` | Empty Tabard slot | [PaperDoll/UI-PaperDoll-Slot-Tabard](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-tabard.blp` |
-| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-Wrists.png` | Empty Wrists slot | [PaperDoll/UI-PaperDoll-Slot-Wrists](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-wrists.blp` |
-| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-Hands.png` | Empty Hands slot | [PaperDoll/UI-PaperDoll-Slot-Hands](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-hands.blp` |
-| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-Waist.png` | Empty Waist slot | [PaperDoll/UI-PaperDoll-Slot-Waist](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-waist.blp` |
-| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-Legs.png` | Empty Legs slot | [PaperDoll/UI-PaperDoll-Slot-Legs](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-legs.blp` |
-| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-Feet.png` | Empty Feet slot | [PaperDoll/UI-PaperDoll-Slot-Feet](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-feet.blp` |
-| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-Finger.png` | Empty Finger slot | [PaperDoll/UI-PaperDoll-Slot-Finger](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-finger.blp` |
-| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-RFinger.png` | Empty RFinger slot | [PaperDoll/UI-PaperDoll-Slot-RFinger](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-rfinger.blp` |
-| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-Trinket.png` | Empty Trinket slot | [PaperDoll/UI-PaperDoll-Slot-Trinket](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-trinket.blp` |
-| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-MainHand.png` | Empty MainHand slot | [PaperDoll/UI-PaperDoll-Slot-MainHand](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-mainhand.blp` |
-| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-SecondaryHand.png` | Empty SecondaryHand slot | [PaperDoll/UI-PaperDoll-Slot-SecondaryHand](https://github.com/Gethe/wow-ui-textures) ﾂｷ [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-secondaryhand.blp` |
+| `assets/Interface/FrameGeneral/UI-Background-Rock.png` | Page background | [FrameGeneral/UI-Background-Rock](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/framegeneral/ui-background-rock.blp` |
+| `assets/Interface/DialogFrame/UI-DialogBox-Background.png` | Panel, dialog, creation screen and character sheet background | [DialogFrame/UI-DialogBox-Background](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dialogframe/ui-dialogbox-background.blp` |
+| `assets/Interface/DialogFrame/UI-DialogBox-Border.png` | Gold/grey dialog border | [DialogFrame/UI-DialogBox-Border](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dialogframe/ui-dialogbox-border.blp` |
+| `assets/Interface/DialogFrame/UI-DialogBox-Header.png` | Title plate on dialogs | [DialogFrame/UI-DialogBox-Header](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dialogframe/ui-dialogbox-header.blp` |
+| `assets/Interface/Tooltips/UI-Tooltip-Border.png` | Tooltip border, inner boxes | [Tooltips/UI-Tooltip-Border](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/tooltips/ui-tooltip-border.blp` |
+| `assets/Interface/TargetingFrame/UI-TargetingFrame.png` | Player and target unit frames | [TargetingFrame/UI-TargetingFrame](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/targetingframe/ui-targetingframe.blp` |
+| `assets/Interface/TargetingFrame/UI-TargetingFrame-Elite.png` | Gold dragon frame for elites | [TargetingFrame/UI-TargetingFrame-Elite](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/targetingframe/ui-targetingframe-elite.blp` |
+| `assets/Interface/TargetingFrame/UI-StatusBar.png` | Health, mana, rage, energy, XP and cast bar fill | [TargetingFrame/UI-StatusBar](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/targetingframe/ui-statusbar.blp` |
+| `assets/Interface/CastingBar/UI-CastingBar-Border.png` | Cast bar border | [CastingBar/UI-CastingBar-Border](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/castingbar/ui-castingbar-border.blp` |
+| `assets/Interface/Buttons/UI-Panel-Button-Up.png` | Red buttons | [Buttons/UI-Panel-Button-Up](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/buttons/ui-panel-button-up.blp` |
+| `assets/Interface/Buttons/UI-Panel-Button-Down.png` | Pressed buttons | [Buttons/UI-Panel-Button-Down](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/buttons/ui-panel-button-down.blp` |
+| `assets/Interface/Buttons/UI-Panel-Button-Disabled.png` | Disabled buttons | [Buttons/UI-Panel-Button-Disabled](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/buttons/ui-panel-button-disabled.blp` |
+| `assets/Interface/PaperDollInfoFrame/UI-Character-ActiveTab.png` | Selected menu tab | [PaperDollInfoFrame/UI-Character-ActiveTab](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/paperdollinfoframe/ui-character-activetab.blp` |
+| `assets/Interface/PaperDollInfoFrame/UI-Character-InActiveTab.png` | Other menu tabs | [PaperDollInfoFrame/UI-Character-InActiveTab](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/paperdollinfoframe/ui-character-inactivetab.blp` |
+| `assets/Interface/PaperDoll/UI-Backpack-EmptySlot.png` | Bag slots | [PaperDoll/UI-Backpack-EmptySlot](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-backpack-emptyslot.blp` |
+| `assets/Interface/Buttons/UI-EmptySlot-Disabled.png` | Bag slots (used if UI-Backpack-EmptySlot is missing) | [Buttons/UI-EmptySlot-Disabled](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/buttons/ui-emptyslot-disabled.blp` |
+| `assets/Interface/MoneyFrame/UI-GoldIcon.png` | Gold coin | [MoneyFrame/UI-GoldIcon](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/moneyframe/ui-goldicon.blp` |
+| `assets/Interface/MoneyFrame/UI-SilverIcon.png` | Silver coin | [MoneyFrame/UI-SilverIcon](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/moneyframe/ui-silvericon.blp` |
+| `assets/Interface/MoneyFrame/UI-CopperIcon.png` | Copper coin | [MoneyFrame/UI-CopperIcon](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/moneyframe/ui-coppericon.blp` |
+| `assets/Interface/Glues/LoadingScreens/LoadScreenEasternKingdom.png` | Character creation background (Alliance) | [Glues/LoadingScreens/LoadScreenEasternKingdom](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/glues/loadingscreens/loadscreeneasternkingdom.blp` |
+| `assets/Interface/Glues/LoadingScreens/LoadScreenKalimdor.png` | Character creation background (Horde) | [Glues/LoadingScreens/LoadScreenKalimdor](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/glues/loadingscreens/loadscreenkalimdor.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-Human1.png` | Character sheet scene behind the model (Human, piece 1 of 4) | [DressUpFrame/DressUpBackground-Human1](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-human1.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-Human2.png` | Character sheet scene behind the model (Human, piece 2 of 4) | [DressUpFrame/DressUpBackground-Human2](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-human2.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-Human3.png` | Character sheet scene behind the model (Human, piece 3 of 4) | [DressUpFrame/DressUpBackground-Human3](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-human3.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-Human4.png` | Character sheet scene behind the model (Human, piece 4 of 4) | [DressUpFrame/DressUpBackground-Human4](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-human4.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-Dwarf1.png` | Character sheet scene behind the model (Dwarf, piece 1 of 4) | [DressUpFrame/DressUpBackground-Dwarf1](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-dwarf1.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-Dwarf2.png` | Character sheet scene behind the model (Dwarf, piece 2 of 4) | [DressUpFrame/DressUpBackground-Dwarf2](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-dwarf2.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-Dwarf3.png` | Character sheet scene behind the model (Dwarf, piece 3 of 4) | [DressUpFrame/DressUpBackground-Dwarf3](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-dwarf3.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-Dwarf4.png` | Character sheet scene behind the model (Dwarf, piece 4 of 4) | [DressUpFrame/DressUpBackground-Dwarf4](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-dwarf4.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-NightElf1.png` | Character sheet scene behind the model (NightElf, piece 1 of 4) | [DressUpFrame/DressUpBackground-NightElf1](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-nightelf1.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-NightElf2.png` | Character sheet scene behind the model (NightElf, piece 2 of 4) | [DressUpFrame/DressUpBackground-NightElf2](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-nightelf2.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-NightElf3.png` | Character sheet scene behind the model (NightElf, piece 3 of 4) | [DressUpFrame/DressUpBackground-NightElf3](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-nightelf3.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-NightElf4.png` | Character sheet scene behind the model (NightElf, piece 4 of 4) | [DressUpFrame/DressUpBackground-NightElf4](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-nightelf4.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-Gnome1.png` | Character sheet scene behind the model (Gnome, piece 1 of 4) | [DressUpFrame/DressUpBackground-Gnome1](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-gnome1.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-Gnome2.png` | Character sheet scene behind the model (Gnome, piece 2 of 4) | [DressUpFrame/DressUpBackground-Gnome2](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-gnome2.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-Gnome3.png` | Character sheet scene behind the model (Gnome, piece 3 of 4) | [DressUpFrame/DressUpBackground-Gnome3](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-gnome3.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-Gnome4.png` | Character sheet scene behind the model (Gnome, piece 4 of 4) | [DressUpFrame/DressUpBackground-Gnome4](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-gnome4.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-Orc1.png` | Character sheet scene behind the model (Orc, piece 1 of 4) | [DressUpFrame/DressUpBackground-Orc1](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-orc1.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-Orc2.png` | Character sheet scene behind the model (Orc, piece 2 of 4) | [DressUpFrame/DressUpBackground-Orc2](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-orc2.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-Orc3.png` | Character sheet scene behind the model (Orc, piece 3 of 4) | [DressUpFrame/DressUpBackground-Orc3](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-orc3.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-Orc4.png` | Character sheet scene behind the model (Orc, piece 4 of 4) | [DressUpFrame/DressUpBackground-Orc4](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-orc4.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-Scourge1.png` | Character sheet scene behind the model (Scourge, piece 1 of 4) | [DressUpFrame/DressUpBackground-Scourge1](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-scourge1.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-Scourge2.png` | Character sheet scene behind the model (Scourge, piece 2 of 4) | [DressUpFrame/DressUpBackground-Scourge2](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-scourge2.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-Scourge3.png` | Character sheet scene behind the model (Scourge, piece 3 of 4) | [DressUpFrame/DressUpBackground-Scourge3](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-scourge3.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-Scourge4.png` | Character sheet scene behind the model (Scourge, piece 4 of 4) | [DressUpFrame/DressUpBackground-Scourge4](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-scourge4.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-Tauren1.png` | Character sheet scene behind the model (Tauren, piece 1 of 4) | [DressUpFrame/DressUpBackground-Tauren1](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-tauren1.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-Tauren2.png` | Character sheet scene behind the model (Tauren, piece 2 of 4) | [DressUpFrame/DressUpBackground-Tauren2](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-tauren2.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-Tauren3.png` | Character sheet scene behind the model (Tauren, piece 3 of 4) | [DressUpFrame/DressUpBackground-Tauren3](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-tauren3.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-Tauren4.png` | Character sheet scene behind the model (Tauren, piece 4 of 4) | [DressUpFrame/DressUpBackground-Tauren4](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-tauren4.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-Troll1.png` | Character sheet scene behind the model (Troll, piece 1 of 4) | [DressUpFrame/DressUpBackground-Troll1](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-troll1.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-Troll2.png` | Character sheet scene behind the model (Troll, piece 2 of 4) | [DressUpFrame/DressUpBackground-Troll2](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-troll2.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-Troll3.png` | Character sheet scene behind the model (Troll, piece 3 of 4) | [DressUpFrame/DressUpBackground-Troll3](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-troll3.blp` |
+| `assets/Interface/DressUpFrame/DressUpBackground-Troll4.png` | Character sheet scene behind the model (Troll, piece 4 of 4) | [DressUpFrame/DressUpBackground-Troll4](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/dressupframe/dressupbackground-troll4.blp` |
+| `assets/Interface/MainMenuBar/UI-MainMenuBar-Dwarf.png` | Action bar | [MainMenuBar/UI-MainMenuBar-Dwarf](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/mainmenubar/ui-mainmenubar-dwarf.blp` |
+| `assets/Interface/QuestFrame/QuestBG.png` | Quest log parchment | [QuestFrame/QuestBG](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/questframe/questbg.blp` |
+| `assets/Interface/QuestFrame/UI-QuestLog-BookIcon.png` | Quest log icon | [QuestFrame/UI-QuestLog-BookIcon](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/questframe/ui-questlog-bookicon.blp` |
+| `assets/Interface/Buttons/UI-Quickslot2.png` | Action bar buttons | [Buttons/UI-Quickslot2](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/buttons/ui-quickslot2.blp` |
+| `assets/Interface/Buttons/UI-Quickslot-Depress.png` | Action bar buttons | [Buttons/UI-Quickslot-Depress](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/buttons/ui-quickslot-depress.blp` |
+| `assets/Interface/Buttons/ButtonHilight-Square.png` | Action bar buttons | [Buttons/ButtonHilight-Square](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/buttons/buttonhilight-square.blp` |
+| `assets/Interface/Buttons/CheckButtonHilight.png` | Action bar buttons | [Buttons/CheckButtonHilight](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/buttons/checkbuttonhilight.blp` |
+| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-Head.png` | Empty Head slot | [PaperDoll/UI-PaperDoll-Slot-Head](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-head.blp` |
+| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-Neck.png` | Empty Neck slot | [PaperDoll/UI-PaperDoll-Slot-Neck](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-neck.blp` |
+| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-Shoulder.png` | Empty Shoulder slot | [PaperDoll/UI-PaperDoll-Slot-Shoulder](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-shoulder.blp` |
+| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-Chest.png` | Empty Chest slot | [PaperDoll/UI-PaperDoll-Slot-Chest](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-chest.blp` |
+| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-Shirt.png` | Empty Shirt slot | [PaperDoll/UI-PaperDoll-Slot-Shirt](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-shirt.blp` |
+| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-Tabard.png` | Empty Tabard slot | [PaperDoll/UI-PaperDoll-Slot-Tabard](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-tabard.blp` |
+| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-Wrists.png` | Empty Wrists slot | [PaperDoll/UI-PaperDoll-Slot-Wrists](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-wrists.blp` |
+| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-Hands.png` | Empty Hands slot | [PaperDoll/UI-PaperDoll-Slot-Hands](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-hands.blp` |
+| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-Waist.png` | Empty Waist slot | [PaperDoll/UI-PaperDoll-Slot-Waist](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-waist.blp` |
+| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-Legs.png` | Empty Legs slot | [PaperDoll/UI-PaperDoll-Slot-Legs](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-legs.blp` |
+| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-Feet.png` | Empty Feet slot | [PaperDoll/UI-PaperDoll-Slot-Feet](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-feet.blp` |
+| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-Finger.png` | Empty Finger slot | [PaperDoll/UI-PaperDoll-Slot-Finger](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-finger.blp` |
+| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-RFinger.png` | Empty RFinger slot | [PaperDoll/UI-PaperDoll-Slot-RFinger](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-rfinger.blp` |
+| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-Trinket.png` | Empty Trinket slot | [PaperDoll/UI-PaperDoll-Slot-Trinket](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-trinket.blp` |
+| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-MainHand.png` | Empty MainHand slot | [PaperDoll/UI-PaperDoll-Slot-MainHand](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-mainhand.blp` |
+| `assets/Interface/PaperDoll/UI-PaperDoll-Slot-SecondaryHand.png` | Empty SecondaryHand slot | [PaperDoll/UI-PaperDoll-Slot-SecondaryHand](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/paperdoll/ui-paperdoll-slot-secondaryhand.blp` |
 
 ### Talent tree backgrounds
 
@@ -76,6 +111,54 @@ Four pieces per tree: ``<Name>-TopLeft``, ``-TopRight``, ``-BottomLeft`` and ``-
 | Mage | MageArcane, MageFire, MageFrost |
 | Warlock | WarlockCurses (= Affliction), WarlockSummoning (= Demonology), WarlockDestruction |
 | Druid | DruidBalance, DruidFeralCombat, DruidRestoration |
+
+## Music
+
+Background music is played from `music/<Name>.mp3` (see `MUSIC` and `MUSIC_GENERAL` in `js/music.js`). Each zone plays its own tracks, each followed by a random general track (at least 3 general tracks per cycle). Missing files are skipped. Volume, mute, mute-in-background and skip are under Settings; `M` toggles mute.
+
+| File | Used in |
+| --- | --- |
+| `TavernAlliance01.mp3` | Character select |
+| `TavernHorde01.mp3` | Character select |
+| `stormwind02-moment.mp3` | Character select |
+| `DayForest01.mp3` | Elwynn Forest, Westfall |
+| `DayPlains01.mp3` | Elwynn Forest, Mulgore, Westfall, The Barrens |
+| `stormwind04-zone.mp3` | Elwynn Forest |
+| `DayMountain01.mp3` | Dun Morogh |
+| `IronForge_Walking_01.mp3` | Dun Morogh |
+| `ironforgewalking02.mp3` | Dun Morogh |
+| `ironforgewalking03(glenn).mp3` | Dun Morogh |
+| `EnchantedForest01.mp3` | Teldrassil, Ashenvale |
+| `NightForest01.mp3` | Teldrassil, Duskwood, Ashenvale |
+| `Darnassus_Walking_1.mp3` | Teldrassil |
+| `darnassuswalking2.mp3` | Teldrassil |
+| `darnassuswalking3.mp3` | Teldrassil |
+| `druidgrove.mp3` | Teldrassil |
+| `DayBarrenDry01.mp3` | Durotar, The Barrens, Tanaris |
+| `orgrimmar01-zone.mp3` | Durotar |
+| `warriorterrace.mp3` | Durotar |
+| `Thunderbluff_Walking_01.mp3` | Mulgore |
+| `CursedLand01.mp3` | Tirisfal Glades |
+| `CursedLand02.mp3` | Tirisfal Glades |
+| `undercity01-zone.mp3` | Tirisfal Glades |
+| `gloomy02.mp3` | Tirisfal Glades, Duskwood |
+| `spooky01-moment.mp3` | Tirisfal Glades, Duskwood |
+| `DayEvilForest01.mp3` | Duskwood |
+| `CursedLand04.mp3` | Duskwood, Burning Steppes |
+| `DayJungle01.mp3` | Stranglethorn Vale, Un'Goro Crater |
+| `DayVolcanic01-new.mp3` | Burning Steppes |
+| `battle01.mp3` | Burning Steppes, **All zones (general)** |
+| `battle04.mp3` | Burning Steppes, **All zones (general)** |
+| `mystery01-zone.mp3` | **All zones (general)** |
+| `mystery02-zone.mp3` | **All zones (general)** |
+| `mystery03-zone.mp3` | **All zones (general)** |
+| `magic01-zone1.mp3` | **All zones (general)** |
+| `sacred01.mp3` | **All zones (general)** |
+| `angelic01.mp3` | **All zones (general)** |
+| `battle03.mp3` | **All zones (general)** |
+| `battle05.mp3` | **All zones (general)** |
+| `world-of-warcraft-lvl-up.mp3` | Level-up jingle |
+| `gnomeragon01-zone.mp3`, `KelThuzad1A.mp3`, `pvp1.mp3` | Not used yet (saved for dungeons, raids and battlegrounds) |
 
 ## Icons
 
