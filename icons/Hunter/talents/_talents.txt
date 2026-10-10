@@ -1,0 +1,49 @@
+Hunter talent icons. Save one image per talent in this folder, named exactly like the talent:
+<Talent Name>.jpg (or .png). Leave out characters Windows can't use, such as ':'. Talents without an icon show an emoji instead.
+
+Improved Aspect of the Hawk.jpg
+Endurance Training.jpg
+Improved Eyes of the Beast.jpg
+Improved Aspect of the Monkey.jpg
+Thick Hide.jpg
+Improved Revive Pet.jpg
+Pathfinding.jpg
+Bestial Swiftness.jpg
+Unleashed Fury.jpg
+Improved Mend Pet.jpg
+Ferocity.jpg
+Spirit Bond.jpg
+Intimidation.jpg
+Bestial Discipline.jpg
+Frenzy.jpg
+Bestial Wrath.jpg
+Improved Concussive Shot.jpg
+Efficiency.jpg
+Improved Hunter's Mark.jpg
+Lethal Shots.jpg
+Aimed Shot.jpg
+Improved Arcane Shot.jpg
+Hawk Eye.jpg
+Improved Serpent Sting.jpg
+Mortal Shots.jpg
+Scatter Shot.jpg
+Barrage.jpg
+Improved Scorpid Sting.jpg
+Ranged Weapon Specialization.jpg
+Trueshot Aura.jpg
+Monster Slaying.jpg
+Humanoid Slaying.jpg
+Deflection.jpg
+Entrapment.jpg
+Savage Strikes.jpg
+Improved Wing Clip.jpg
+Clever Traps.jpg
+Survivalist.jpg
+Deterrence.jpg
+Trap Mastery.jpg
+Surefooted.jpg
+Improved Feign Death.jpg
+Killer Instinct.jpg
+Counterattack.jpg
+Lightning Reflexes.jpg
+Wyvern Sting.jpg

@@ -1,0 +1,5 @@
+Racial ability icons. Save each as <Ability Name>.jpg (or .png).
+
+Blood Fury.jpg   <- https://www.wowhead.com/classic/search?q=Blood%20Fury
+War Stomp.jpg   <- https://www.wowhead.com/classic/search?q=War%20Stomp
+Berserking.jpg   <- https://www.wowhead.com/classic/search?q=Berserking

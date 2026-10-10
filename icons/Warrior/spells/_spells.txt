@@ -1,0 +1,17 @@
+Warrior spell icons. Save each as <Spell Name>.jpg (or .png). Leave out characters Windows can't use, such as ':'.
+
+Battle Shout.jpg   <- https://www.wowhead.com/classic/search?q=Battle%20Shout
+Charge.jpg   <- https://www.wowhead.com/classic/search?q=Charge
+Bloodrage.jpg   <- https://www.wowhead.com/classic/search?q=Bloodrage
+Last Stand.jpg   <- https://www.wowhead.com/classic/search?q=Last%20Stand
+Death Wish.jpg   <- https://www.wowhead.com/classic/search?q=Death%20Wish
+Sweeping Strikes.jpg   <- https://www.wowhead.com/classic/search?q=Sweeping%20Strikes
+Execute.jpg   <- https://www.wowhead.com/classic/search?q=Execute
+Overpower.jpg   <- https://www.wowhead.com/classic/search?q=Overpower
+Mortal Strike.jpg   <- https://www.wowhead.com/classic/search?q=Mortal%20Strike
+Bloodthirst.jpg   <- https://www.wowhead.com/classic/search?q=Bloodthirst
+Shield Slam.jpg   <- https://www.wowhead.com/classic/search?q=Shield%20Slam
+Concussion Blow.jpg   <- https://www.wowhead.com/classic/search?q=Concussion%20Blow
+Whirlwind.jpg   <- https://www.wowhead.com/classic/search?q=Whirlwind
+Rend.jpg   <- https://www.wowhead.com/classic/search?q=Rend
+Heroic Strike.jpg   <- https://www.wowhead.com/classic/search?q=Heroic%20Strike

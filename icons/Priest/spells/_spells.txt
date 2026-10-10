@@ -1,0 +1,19 @@
+Priest spell icons. Save each as <Spell Name>.jpg (or .png). Leave out characters Windows can't use, such as ':'.
+
+Power Word Fortitude.jpg   <- https://www.wowhead.com/classic/search?q=Power%20Word%3A%20Fortitude
+Inner Fire.jpg   <- https://www.wowhead.com/classic/search?q=Inner%20Fire
+Shadowform.jpg   <- https://www.wowhead.com/classic/search?q=Shadowform
+Vampiric Embrace.jpg   <- https://www.wowhead.com/classic/search?q=Vampiric%20Embrace
+Power Word Shield.jpg   <- https://www.wowhead.com/classic/search?q=Power%20Word%3A%20Shield
+Inner Focus.jpg   <- https://www.wowhead.com/classic/search?q=Inner%20Focus
+Power Infusion.jpg   <- https://www.wowhead.com/classic/search?q=Power%20Infusion
+Lesser Heal.jpg   <- https://www.wowhead.com/classic/search?q=Lesser%20Heal
+Renew.jpg   <- https://www.wowhead.com/classic/search?q=Renew
+Lightwell.jpg   <- https://www.wowhead.com/classic/search?q=Lightwell
+Silence.jpg   <- https://www.wowhead.com/classic/search?q=Silence
+Holy Nova.jpg   <- https://www.wowhead.com/classic/search?q=Holy%20Nova
+Shadow Word Pain.jpg   <- https://www.wowhead.com/classic/search?q=Shadow%20Word%3A%20Pain
+Mind Blast.jpg   <- https://www.wowhead.com/classic/search?q=Mind%20Blast
+Mind Flay.jpg   <- https://www.wowhead.com/classic/search?q=Mind%20Flay
+Holy Fire.jpg   <- https://www.wowhead.com/classic/search?q=Holy%20Fire
+Smite.jpg   <- https://www.wowhead.com/classic/search?q=Smite

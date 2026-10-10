@@ -1,0 +1,6 @@
+Files the game looks for in this folder (see ASSETS.md for sources):
+
+UI-Panel-Button-Up.png
+UI-Panel-Button-Down.png
+UI-Panel-Button-Disabled.png
+UI-EmptySlot-Disabled.png

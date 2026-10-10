@@ -1,0 +1,18 @@
+Hunter spell icons. Save each as <Spell Name>.jpg (or .png). Leave out characters Windows can't use, such as ':'.
+
+Aspect of the Hawk.jpg   <- https://www.wowhead.com/classic/search?q=Aspect%20of%20the%20Hawk
+Hunter's Mark.jpg   <- https://www.wowhead.com/classic/search?q=Hunter's%20Mark
+Trueshot Aura.jpg   <- https://www.wowhead.com/classic/search?q=Trueshot%20Aura
+Call Pet.jpg   <- https://www.wowhead.com/classic/search?q=Call%20Pet
+Bestial Wrath.jpg   <- https://www.wowhead.com/classic/search?q=Bestial%20Wrath
+Rapid Fire.jpg   <- https://www.wowhead.com/classic/search?q=Rapid%20Fire
+Deterrence.jpg   <- https://www.wowhead.com/classic/search?q=Deterrence
+Intimidation.jpg   <- https://www.wowhead.com/classic/search?q=Intimidation
+Scatter Shot.jpg   <- https://www.wowhead.com/classic/search?q=Scatter%20Shot
+Wyvern Sting.jpg   <- https://www.wowhead.com/classic/search?q=Wyvern%20Sting
+Counterattack.jpg   <- https://www.wowhead.com/classic/search?q=Counterattack
+Aimed Shot.jpg   <- https://www.wowhead.com/classic/search?q=Aimed%20Shot
+Multi-Shot.jpg   <- https://www.wowhead.com/classic/search?q=Multi-Shot
+Serpent Sting.jpg   <- https://www.wowhead.com/classic/search?q=Serpent%20Sting
+Arcane Shot.jpg   <- https://www.wowhead.com/classic/search?q=Arcane%20Shot
+Raptor Strike.jpg   <- https://www.wowhead.com/classic/search?q=Raptor%20Strike

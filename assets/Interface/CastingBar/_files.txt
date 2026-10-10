@@ -1,0 +1,3 @@
+Files the game looks for in this folder (see ASSETS.md for sources):
+
+UI-CastingBar-Border.png

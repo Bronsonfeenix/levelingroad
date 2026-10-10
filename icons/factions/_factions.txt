@@ -1,0 +1,4 @@
+Faction icons for character creation and the world map.
+
+alliance.jpg   <- https://wow.zamimg.com/images/wow/icons/large/inv_bannerpvp_02.jpg
+horde.jpg   <- https://wow.zamimg.com/images/wow/icons/large/inv_bannerpvp_01.jpg

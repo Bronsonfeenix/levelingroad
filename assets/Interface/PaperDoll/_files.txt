@@ -1,0 +1,23 @@
+Files the game looks for in this folder (see ASSETS.md for sources):
+
+UI-Backpack-EmptySlot.png
+UI-PaperDollBackground-L1.png
+UI-PaperDollBackground-R1.png
+UI-PaperDollBackground-L2.png
+UI-PaperDollBackground-R2.png
+UI-PaperDoll-Slot-Head.png
+UI-PaperDoll-Slot-Neck.png
+UI-PaperDoll-Slot-Shoulder.png
+UI-PaperDoll-Slot-Chest.png
+UI-PaperDoll-Slot-Shirt.png
+UI-PaperDoll-Slot-Tabard.png
+UI-PaperDoll-Slot-Wrists.png
+UI-PaperDoll-Slot-Hands.png
+UI-PaperDoll-Slot-Waist.png
+UI-PaperDoll-Slot-Legs.png
+UI-PaperDoll-Slot-Feet.png
+UI-PaperDoll-Slot-Finger.png
+UI-PaperDoll-Slot-RFinger.png
+UI-PaperDoll-Slot-Trinket.png
+UI-PaperDoll-Slot-MainHand.png
+UI-PaperDoll-Slot-SecondaryHand.png

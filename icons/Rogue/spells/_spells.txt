@@ -1,0 +1,18 @@
+Rogue spell icons. Save each as <Spell Name>.jpg (or .png). Leave out characters Windows can't use, such as ':'.
+
+Instant Poison.jpg   <- https://www.wowhead.com/classic/search?q=Instant%20Poison
+Premeditation.jpg   <- https://www.wowhead.com/classic/search?q=Premeditation
+Preparation.jpg   <- https://www.wowhead.com/classic/search?q=Preparation
+Evasion.jpg   <- https://www.wowhead.com/classic/search?q=Evasion
+Cold Blood.jpg   <- https://www.wowhead.com/classic/search?q=Cold%20Blood
+Adrenaline Rush.jpg   <- https://www.wowhead.com/classic/search?q=Adrenaline%20Rush
+Blade Flurry.jpg   <- https://www.wowhead.com/classic/search?q=Blade%20Flurry
+Slice and Dice.jpg   <- https://www.wowhead.com/classic/search?q=Slice%20and%20Dice
+Rupture.jpg   <- https://www.wowhead.com/classic/search?q=Rupture
+Eviscerate.jpg   <- https://www.wowhead.com/classic/search?q=Eviscerate
+Riposte.jpg   <- https://www.wowhead.com/classic/search?q=Riposte
+Backstab.jpg   <- https://www.wowhead.com/classic/search?q=Backstab
+Ghostly Strike.jpg   <- https://www.wowhead.com/classic/search?q=Ghostly%20Strike
+Kick.jpg   <- https://www.wowhead.com/classic/search?q=Kick
+Hemorrhage.jpg   <- https://www.wowhead.com/classic/search?q=Hemorrhage
+Sinister Strike.jpg   <- https://www.wowhead.com/classic/search?q=Sinister%20Strike

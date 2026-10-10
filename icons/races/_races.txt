@@ -1,0 +1,10 @@
+Race icons for character creation and the character sheet. File names are the race ids below.
+
+human.jpg   <- https://wow.zamimg.com/images/wow/icons/large/achievement_character_human_male.jpg
+dwarf.jpg   <- https://wow.zamimg.com/images/wow/icons/large/achievement_character_dwarf_male.jpg
+nightelf.jpg   <- https://wow.zamimg.com/images/wow/icons/large/achievement_character_nightelf_male.jpg
+gnome.jpg   <- https://wow.zamimg.com/images/wow/icons/large/achievement_character_gnome_male.jpg
+orc.jpg   <- https://wow.zamimg.com/images/wow/icons/large/achievement_character_orc_male.jpg
+undead.jpg   <- https://wow.zamimg.com/images/wow/icons/large/achievement_character_undead_male.jpg
+tauren.jpg   <- https://wow.zamimg.com/images/wow/icons/large/achievement_character_tauren_male.jpg
+troll.jpg   <- https://wow.zamimg.com/images/wow/icons/large/achievement_character_troll_male.jpg

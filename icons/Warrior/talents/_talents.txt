@@ -1,0 +1,55 @@
+Warrior talent icons. Save one image per talent in this folder, named exactly like the talent:
+<Talent Name>.jpg (or .png). Leave out characters Windows can't use, such as ':'. Talents without an icon show an emoji instead.
+
+Improved Heroic Strike.jpg
+Deflection.jpg
+Improved Rend.jpg
+Improved Charge.jpg
+Tactical Mastery.jpg
+Improved Thunder Clap.jpg
+Improved Overpower.jpg
+Anger Management.jpg
+Deep Wounds.jpg
+Two-Handed Weapon Specialization.jpg
+Impale.jpg
+Axe Specialization.jpg
+Sweeping Strikes.jpg
+Mace Specialization.jpg
+Sword Specialization.jpg
+Polearm Specialization.jpg
+Improved Hamstring.jpg
+Mortal Strike.jpg
+Booming Voice.jpg
+Cruelty.jpg
+Improved Demoralizing Shout.jpg
+Unbridled Wrath.jpg
+Improved Cleave.jpg
+Piercing Howl.jpg
+Blood Craze.jpg
+Improved Battle Shout.jpg
+Dual Wield Specialization.jpg
+Improved Execute.jpg
+Enrage.jpg
+Improved Slam.jpg
+Death Wish.jpg
+Improved Intercept.jpg
+Improved Berserker Rage.jpg
+Flurry.jpg
+Bloodthirst.jpg
+Shield Specialization.jpg
+Anticipation.jpg
+Improved Bloodrage.jpg
+Toughness.jpg
+Iron Will.jpg
+Last Stand.jpg
+Improved Shield Block.jpg
+Improved Revenge.jpg
+Defiance.jpg
+Improved Sunder Armor.jpg
+Improved Disarm.jpg
+Improved Taunt.jpg
+Improved Shield Wall.jpg
+Concussion Blow.jpg
+Improved Shield Bash.jpg
+One-Handed Weapon Specialization.jpg
+Shield Slam.jpg

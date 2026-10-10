@@ -1,0 +1,53 @@
+Warlock talent icons. Save one image per talent in this folder, named exactly like the talent:
+<Talent Name>.jpg (or .png). Leave out characters Windows can't use, such as ':'. Talents without an icon show an emoji instead.
+
+Suppression.jpg
+Improved Corruption.jpg
+Improved Curse of Weakness.jpg
+Improved Drain Soul.jpg
+Improved Life Tap.jpg
+Improved Drain Life.jpg
+Improved Curse of Agony.jpg
+Fel Concentration.jpg
+Amplify Curse.jpg
+Grim Reach.jpg
+Nightfall.jpg
+Improved Drain Mana.jpg
+Siphon Life.jpg
+Curse of Exhaustion.jpg
+Improved Curse of Exhaustion.jpg
+Shadow Mastery.jpg
+Dark Pact.jpg
+Improved Healthstone.jpg
+Improved Imp.jpg
+Demonic Embrace.jpg
+Improved Health Funnel.jpg
+Improved Voidwalker.jpg
+Fel Intellect.jpg
+Improved Succubus.jpg
+Fel Domination.jpg
+Fel Stamina.jpg
+Master Summoner.jpg
+Unholy Power.jpg
+Improved Enslave Demon.jpg
+Demonic Sacrifice.jpg
+Improved Firestone.jpg
+Master Demonologist.jpg
+Improved Spellstone.jpg
+Soul Link.jpg
+Improved Shadow Bolt.jpg
+Cataclysm.jpg
+Bane.jpg
+Aftermath.jpg
+Improved Firebolt.jpg
+Improved Lash of Pain.jpg
+Devastation.jpg
+Shadowburn.jpg
+Intensity.jpg
+Destructive Reach.jpg
+Improved Searing Pain.jpg
+Pyroclasm.jpg
+Improved Immolate.jpg
+Ruin.jpg
+Emberstorm.jpg
+Conflagrate.jpg

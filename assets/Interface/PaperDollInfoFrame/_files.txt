@@ -1,0 +1,4 @@
+Files the game looks for in this folder (see ASSETS.md for sources):
+
+UI-Character-ActiveTab.png
+UI-Character-InActiveTab.png

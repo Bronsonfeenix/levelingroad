@@ -1,0 +1,5 @@
+Files the game looks for in this folder (see ASSETS.md for sources):
+
+UI-DialogBox-Background.png
+UI-DialogBox-Border.png
+UI-DialogBox-Header.png

@@ -1,0 +1,161 @@
+/* =====================================================================
+   Original World of Warcraft art skin.
+   Each rule only applies when the matching file exists (js/assets.js adds a
+   "has-<name>" class to <html>). Without the files the default look stays.
+   Geometry for unit frames and the cast bar follows Blizzard's FrameXML.
+   ===================================================================== */
+
+/* ---------- always on: Classic-style touches that need no files ---------- */
+h3, .tab, .zname, .thead, .clabel { color: #ffd100; }
+.xpbar::after { /* the 20 "bubbles" of the Classic experience bar */
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(90deg, transparent 0 calc(5% - 1px), rgba(0,0,0,.65) calc(5% - 1px) 5%);
+}
+.xptext { z-index: 1; }
+.xpfill { background: linear-gradient(#a33bd6, #6a1c94); }
+.tooltip { background: rgba(0,0,10,.92); border: 2px solid #b5b5b5; border-radius: 5px; }
+.ico, .iico, .rimg, .cf-img, .inl, .tt-icon { display: inline-block; object-fit: cover; }
+.ico-fb { display: inline-grid; place-items: center; }
+.buff img { width: 100%; height: 100%; border-radius: 3px; }
+.sslot img.iico, .cell img.iico { width: 100%; height: 100%; border-radius: 3px; }
+.ricon img.rimg { width: 36px; height: 36px; border-radius: 4px; border: 1px solid #000; box-shadow: 0 0 0 1px #555; vertical-align: middle; }
+img.inl { width: 22px; height: 22px; border-radius: 4px; vertical-align: -5px; border: 1px solid #000; }
+img.cp-img { width: 34px; height: 34px; border-radius: 6px; border: 1px solid #000; }
+img.cf-img { width: 30px; height: 30px; border-radius: 5px; }
+.cf-i { display: inline-grid; place-items: center; font-size: 24px; }
+.tt-tal .ico-fb { font-size: 20px; width: 30px; flex: none; }
+.tt-tal img.tt-icon { position: static; transform: none; width: 30px; height: 30px; flex: none; }
+.tt-grant img.inl { width: 18px; height: 18px; }
+.portrait canvas { width: 100%; height: 100%; border-radius: 50%; display: block; }
+/* Classic talent art: 4 pieces making 320×384, of which the picture fills about 296×332, so the layer is scaled up to hide the padding */
+.tree.art { position: relative; overflow: hidden; background: #000; }
+.tree.art::before { content: ''; position: absolute; left: 0; top: 0; width: 108.1%; height: 115.7%; z-index: 0; pointer-events: none;
+  background-image: var(--tart); background-size: 80% 66.67%, 20% 66.67%, 80% 33.34%, 20% 33.34%; background-position: 0 0, 100% 0, 0 100%, 100% 100%; background-repeat: no-repeat; }
+.tree.art > * { position: relative; z-index: 1; }
+.tree.art .thead { background: rgba(0,0,0,.55); border-radius: 4px; padding: 2px 0; }
+
+/* ---------- font: Friz Quadrata ---------- */
+.has-font { --display: 'Friz', Georgia, serif; --body: 'Friz', 'Alegreya Sans', sans-serif; }
+.has-font h3, .has-font .tab { letter-spacing: 0; }
+
+/* ---------- page background ---------- */
+
+
+/* ---------- status bars (health, mana, rage, energy, experience, cast) ---------- */
+.has-statusBar .bar .fill, .has-statusBar .xpfill, .has-statusBar .castbar .fill {
+  background-image: var(--a-statusBar); background-size: 100% 100%; background-blend-mode: multiply;
+}
+.has-statusBar .bar.hp .fill { background-color: #00ff00; }
+.has-statusBar .bar.res .fill { background-color: #ff0000; }
+.has-statusBar .bar.res[data-res="mana"] .fill { background-color: #0000ff; }
+.has-statusBar .bar.res[data-res="energy"] .fill { background-color: #ffff00; }
+.has-statusBar .xpfill { background-color: #940090; }
+.has-statusBar .castbar .fill { background-color: #ffb300; }
+
+/* ---------- unit frames (UI-TargetingFrame: 232×100 of a 256×128 texture) ---------- */
+.has-targetFrame .frame { position: relative; display: block; width: 232px; height: 100px; padding: 0; border: 0; border-radius: 0; background: none; }
+.has-targetFrame .frame::before { content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: var(--a-targetFrame) -24px 0 / 256px 128px no-repeat; }
+.has-targetFrame .frame.player::before { transform: scaleX(-1); }
+/* Behind the frame art: the target's red (hostile) name plate and an empty, dark mana slot */
+.has-targetFrame .frame.target { background: linear-gradient(rgba(200,0,0,.75), rgba(140,0,0,.75)) 6px 22px / 119px 19px no-repeat, linear-gradient(#000, #000) 6px 41px / 119px 23px no-repeat; }
+.has-targetFrame .frame.player { background: linear-gradient(#000, #000) 106px 41px / 119px 23px no-repeat; }
+.has-targetFrame .frame.target .fname { color: #fff; }
+.has-targetElite .frame.target.elite::before { background-image: var(--a-targetElite); }
+.has-targetFrame .frame .bars { display: contents; }
+.has-targetFrame .frame .portrait { position: absolute; top: 12px; width: 64px; height: 64px; border: 0; box-shadow: none; z-index: auto; background: #000; overflow: hidden; font-size: 30px; }
+.has-targetFrame .frame.player .portrait { left: 42px; }
+.has-targetFrame .frame.target .portrait { right: 42px; }
+.has-targetFrame .frame .bar { position: absolute; width: 119px; height: 12px; margin: 0; border: 0; border-radius: 0; background: #000; z-index: 1; }
+.has-targetFrame .frame.player .bar { left: 106px; }
+.has-targetFrame .frame.target .bar { left: 6px; }
+.has-targetFrame .frame .bar.hp { top: 41px; }
+.has-targetFrame .frame .bar.res { top: 52px; }
+.has-targetFrame .frame .bar span { font-size: 9px; }
+.has-targetFrame .frame .fname { position: absolute; top: 24px; width: 119px; z-index: 3; text-align: center; font-size: 12px; color: #ffd100; }
+.has-targetFrame .frame.player .fname { left: 106px; }
+.has-targetFrame .frame.target .fname { left: 6px; }
+/* Level text: centred at (53,66) on the player frame and (179,66) on the target frame, i.e. on the portrait's lower corner */
+.has-targetFrame .frame .portrait { overflow: visible; }
+.has-targetFrame .frame .portrait > :first-child { display: block; width: 64px; height: 64px; border-radius: 50%; overflow: hidden; }
+.has-targetFrame .frame .lvl { position: absolute; top: 46px; bottom: auto; width: 24px; z-index: 3; background: none; border: 0; padding: 0; text-align: center; font-size: 12px; color: #ffd100; }
+.has-targetFrame .frame.player .lvl { left: -1px; right: auto; }
+.has-targetFrame .frame.target .lvl { left: auto; right: -1px; }
+.has-targetFrame .frame .elitetag, .has-targetFrame .frame.target.elite .elitetag { display: none; }
+.has-targetFrame .frame .ttype { position: absolute; left: 6px; top: 66px; width: 119px; text-align: center; z-index: 3; }
+.has-targetFrame .combo { padding-left: 110px; }
+@media (max-width: 560px) {
+  .has-targetFrame .hudleft { transform: scale(.72); transform-origin: top left; }
+  .has-targetFrame .hudright { transform: scale(.72); transform-origin: top right; }
+}
+
+/* ---------- cast bar (195×13 bar inside a 256×64 border) ---------- */
+.has-castBorder .castbar { width: 195px; height: 13px; overflow: visible; border: 0; border-radius: 0; margin: 30px 0 22px 30px; background: rgba(0,0,0,.6); }
+.has-castBorder .castbar::after { content: ''; position: absolute; left: -30px; top: -28px; width: 256px; height: 64px; background: var(--a-castBorder) 0 0 / 100% 100%; pointer-events: none; }
+.has-castBorder .castbar span { z-index: 1; font-size: 11px; }
+
+/* ---------- dialog frames (panels, modals, creation screen, character sheet) ---------- */
+.has-dialogBg .panel, .has-dialogBg .mbox, .has-dialogBg .cleft, .has-dialogBg .cright, .has-dialogBg .wowframe {
+  background: var(--a-dialogBg) repeat, #000; border-color: transparent; border-radius: 0;
+}
+.has-dialogBorderNine .panel, .has-dialogBorderNine .mbox, .has-dialogBorderNine .cleft, .has-dialogBorderNine .cright, .has-dialogBorderNine .wowframe { position: relative; border-color: transparent; box-shadow: none; }
+.has-dialogBorderNine .panel::before, .has-dialogBorderNine .mbox::before, .has-dialogBorderNine .cleft::before, .has-dialogBorderNine .cright::before, .has-dialogBorderNine .wowframe::before {
+  content: ''; position: absolute; inset: -9px; pointer-events: none; z-index: 1;
+  border-style: solid; border-width: calc(var(--a-dialogBorderEdge) * 1px); border-color: transparent;
+  border-image: var(--a-dialogBorderNine) var(--a-dialogBorderEdge) round;
+}
+.has-dialogHeader .mbox { margin-top: 30px; }
+.has-dialogHeader .mbox h3 { margin: -46px auto 12px; width: 256px; max-width: 100%; padding: 14px 0 26px; text-align: center; font-size: 15px;
+  background: var(--a-dialogHeader) center top / 256px 64px no-repeat; position: relative; z-index: 2; }
+
+/* ---------- tooltips and inner boxes ---------- */
+.has-tooltipBorderNine .tooltip, .has-tooltipBorderNine .detail, .has-tooltipBorderNine .sidecard, .has-tooltipBorderNine .wstat {
+  position: relative; border-color: transparent; border-radius: 0;
+}
+.has-tooltipBorderNine .tooltip { background: rgba(0,0,0,.85); }
+.has-tooltipBorderNine .tooltip::before, .has-tooltipBorderNine .detail::before, .has-tooltipBorderNine .sidecard::before, .has-tooltipBorderNine .wstat::before {
+  content: ''; position: absolute; inset: -3px; pointer-events: none;
+  border-style: solid; border-width: calc(var(--a-tooltipBorderEdge) * 1px); border-color: transparent;
+  border-image: var(--a-tooltipBorderNine) var(--a-tooltipBorderEdge) round;
+}
+
+/* ---------- buttons (UI-Panel-Button: 80×22 of a 128×32 texture) ---------- */
+.has-btnUp .btn, .has-btnUp .btn.primary, .has-btnUp .btn.danger {
+  background: var(--a-btnUp) 0 0 / 160% 145.45% no-repeat; border: 0; border-radius: 0;
+  color: #ffd100; text-shadow: 0 1px 1px #000; min-height: 24px;
+}
+.has-btnUp .btn:hover:not(:disabled) { filter: brightness(1.2); color: #fff; }
+.has-btnDown .btn:active:not(:disabled) { background-image: var(--a-btnDown); }
+.has-btnDisabled .btn:disabled { background-image: var(--a-btnDisabled); color: #808080; opacity: 1; }
+
+/* ---------- tabs (character frame tabs, flipped to sit on top of the panel) ---------- */
+.has-tabInactive .tab { position: relative; isolation: isolate; background: none; border: 0; color: #ffd100; }
+.has-tabInactive .tab::before { content: ''; position: absolute; inset: 0; z-index: -1; transform: scaleY(-1);
+  border-style: solid; border-width: 0 10px; border-color: transparent; border-image: var(--a-tabInactive) 0 10 fill / 0 10px stretch; }
+.has-tabActive .tab.active::before { border-image-source: var(--a-tabActive); }
+.has-tabActive .tab.active { color: #fff; }
+
+/* ---------- money ---------- */
+.has-gold .coin.g::after { background: var(--a-gold) center / contain no-repeat; box-shadow: none; border-radius: 0; width: 13px; height: 13px; }
+.has-silver .coin.s::after { background: var(--a-silver) center / contain no-repeat; box-shadow: none; border-radius: 0; width: 13px; height: 13px; }
+.has-copper .coin.c::after { background: var(--a-copper) center / contain no-repeat; box-shadow: none; border-radius: 0; width: 13px; height: 13px; }
+
+/* Stone instead of the near-black dialog texture: UI-Background-Rock for frames, darker for the page */
+.has-rock body { background: radial-gradient(ellipse at 50% 20%, rgba(0,0,0,.45), rgba(0,0,0,.85) 75%), var(--a-rock) repeat; }
+.has-rock .panel, .has-rock .mbox, .has-rock .cleft, .has-rock .cright, .has-rock .wowframe {
+  background: linear-gradient(rgba(0,0,0,.12), rgba(0,0,0,.28)), var(--a-rock) repeat; border-color: transparent; border-radius: 0;
+}
+.has-rock .sidecard, .has-rock .detail, .has-rock .row, .has-rock .wstat, .has-rock .settings select,
+.has-rock .slot, .has-rock .ttab, .has-rock .cpick, .has-rock .zone { background-color: rgba(0,0,0,.5); }
+.has-rock .row, .has-rock .sidecard, .has-rock .detail { border-color: rgba(0,0,0,.6); box-shadow: inset 0 0 0 1px rgba(255,255,255,.06); }
+.has-rock .tree:not(.art) { background: rgba(0,0,0,.45); }
+.has-rock .srow { border-bottom-color: rgba(255,255,255,.08); }
+
+/* ---------- item slots ---------- */
+.has-bagSlotAlt .cell { background: var(--a-bagSlotAlt) center / 100% 100% no-repeat; }
+.has-bagSlot .cell { background: var(--a-bagSlot) center / 100% 100% no-repeat; border-color: #000; }
+.sslot.empty.tex { font-size: 0; opacity: 1; filter: none; background-size: 100% 100%; border-color: #000; }
+
+/* ---------- character creation: faction loading screens ---------- */
+.has-loadAlliance .create.alliance { background: linear-gradient(rgba(0,0,0,.35), rgba(0,0,0,.8)), var(--a-loadAlliance) center / cover no-repeat; }
+.has-loadHorde .create.horde { background: linear-gradient(rgba(0,0,0,.35), rgba(0,0,0,.8)), var(--a-loadHorde) center / cover no-repeat; }

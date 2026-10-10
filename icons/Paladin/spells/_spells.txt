@@ -1,0 +1,20 @@
+Paladin spell icons. Save each as <Spell Name>.jpg (or .png). Leave out characters Windows can't use, such as ':'.
+
+Seal of Righteousness.jpg   <- https://www.wowhead.com/classic/search?q=Seal%20of%20Righteousness
+Seal of Command.jpg   <- https://www.wowhead.com/classic/search?q=Seal%20of%20Command
+Devotion Aura.jpg   <- https://www.wowhead.com/classic/search?q=Devotion%20Aura
+Blessing of Might.jpg   <- https://www.wowhead.com/classic/search?q=Blessing%20of%20Might
+Blessing of Kings.jpg   <- https://www.wowhead.com/classic/search?q=Blessing%20of%20Kings
+Blessing of Sanctuary.jpg   <- https://www.wowhead.com/classic/search?q=Blessing%20of%20Sanctuary
+Sanctity Aura.jpg   <- https://www.wowhead.com/classic/search?q=Sanctity%20Aura
+Lay on Hands.jpg   <- https://www.wowhead.com/classic/search?q=Lay%20on%20Hands
+Divine Favor.jpg   <- https://www.wowhead.com/classic/search?q=Divine%20Favor
+Holy Light.jpg   <- https://www.wowhead.com/classic/search?q=Holy%20Light
+Holy Shield.jpg   <- https://www.wowhead.com/classic/search?q=Holy%20Shield
+Hammer of Justice.jpg   <- https://www.wowhead.com/classic/search?q=Hammer%20of%20Justice
+Repentance.jpg   <- https://www.wowhead.com/classic/search?q=Repentance
+Hammer of Wrath.jpg   <- https://www.wowhead.com/classic/search?q=Hammer%20of%20Wrath
+Holy Shock.jpg   <- https://www.wowhead.com/classic/search?q=Holy%20Shock
+Exorcism.jpg   <- https://www.wowhead.com/classic/search?q=Exorcism
+Judgement.jpg   <- https://www.wowhead.com/classic/search?q=Judgement
+Consecration.jpg   <- https://www.wowhead.com/classic/search?q=Consecration

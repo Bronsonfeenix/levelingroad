@@ -1,0 +1,50 @@
+Priest talent icons. Save one image per talent in this folder, named exactly like the talent:
+<Talent Name>.jpg (or .png). Leave out characters Windows can't use, such as ':'. Talents without an icon show an emoji instead.
+
+Unbreakable Will.jpg
+Wand Specialization.jpg
+Silent Resolve.jpg
+Improved Power Word Fortitude.jpg
+Improved Power Word Shield.jpg
+Martyrdom.jpg
+Inner Focus.jpg
+Meditation.jpg
+Improved Inner Fire.jpg
+Mental Agility.jpg
+Improved Mana Burn.jpg
+Mental Strength.jpg
+Divine Spirit.jpg
+Force of Will.jpg
+Power Infusion.jpg
+Healing Focus.jpg
+Improved Renew.jpg
+Holy Specialization.jpg
+Spell Warding.jpg
+Divine Fury.jpg
+Holy Nova.jpg
+Blessed Recovery.jpg
+Inspiration.jpg
+Holy Reach.jpg
+Improved Healing.jpg
+Searing Light.jpg
+Improved Prayer of Healing.jpg
+Spirit of Redemption.jpg
+Spiritual Guidance.jpg
+Spiritual Healing.jpg
+Lightwell.jpg
+Spirit Tap.jpg
+Blackout.jpg
+Shadow Affinity.jpg
+Improved Shadow Word Pain.jpg
+Shadow Focus.jpg
+Improved Psychic Scream.jpg
+Improved Mind Blast.jpg
+Mind Flay.jpg
+Improved Fade.jpg
+Shadow Reach.jpg
+Shadow Weaving.jpg
+Silence.jpg
+Vampiric Embrace.jpg
+Improved Vampiric Embrace.jpg
+Darkness.jpg
+Shadowform.jpg

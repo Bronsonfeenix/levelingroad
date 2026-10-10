@@ -1,0 +1,20 @@
+Druid spell icons. Save each as <Spell Name>.jpg (or .png). Leave out characters Windows can't use, such as ':'.
+
+Mark of the Wild.jpg   <- https://www.wowhead.com/classic/search?q=Mark%20of%20the%20Wild
+Thorns.jpg   <- https://www.wowhead.com/classic/search?q=Thorns
+Cat Form.jpg   <- https://www.wowhead.com/classic/search?q=Cat%20Form
+Moonkin Form.jpg   <- https://www.wowhead.com/classic/search?q=Moonkin%20Form
+Leader of the Pack.jpg   <- https://www.wowhead.com/classic/search?q=Leader%20of%20the%20Pack
+Nature's Swiftness.jpg   <- https://www.wowhead.com/classic/search?q=Nature's%20Swiftness
+Swiftmend.jpg   <- https://www.wowhead.com/classic/search?q=Swiftmend
+Healing Touch.jpg   <- https://www.wowhead.com/classic/search?q=Healing%20Touch
+Rejuvenation.jpg   <- https://www.wowhead.com/classic/search?q=Rejuvenation
+Rip.jpg   <- https://www.wowhead.com/classic/search?q=Rip
+Ferocious Bite.jpg   <- https://www.wowhead.com/classic/search?q=Ferocious%20Bite
+Shred.jpg   <- https://www.wowhead.com/classic/search?q=Shred
+Rake.jpg   <- https://www.wowhead.com/classic/search?q=Rake
+Claw.jpg   <- https://www.wowhead.com/classic/search?q=Claw
+Insect Swarm.jpg   <- https://www.wowhead.com/classic/search?q=Insect%20Swarm
+Moonfire.jpg   <- https://www.wowhead.com/classic/search?q=Moonfire
+Starfire.jpg   <- https://www.wowhead.com/classic/search?q=Starfire
+Wrath.jpg   <- https://www.wowhead.com/classic/search?q=Wrath

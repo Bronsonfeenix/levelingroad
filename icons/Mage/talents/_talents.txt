@@ -1,0 +1,52 @@
+Mage talent icons. Save one image per talent in this folder, named exactly like the talent:
+<Talent Name>.jpg (or .png). Leave out characters Windows can't use, such as ':'. Talents without an icon show an emoji instead.
+
+Arcane Subtlety.jpg
+Arcane Focus.jpg
+Improved Arcane Missiles.jpg
+Wand Specialization.jpg
+Magic Absorption.jpg
+Arcane Concentration.jpg
+Magic Attunement.jpg
+Improved Arcane Explosion.jpg
+Arcane Resilience.jpg
+Improved Mana Shield.jpg
+Improved Counterspell.jpg
+Arcane Meditation.jpg
+Presence of Mind.jpg
+Arcane Mind.jpg
+Arcane Instability.jpg
+Arcane Power.jpg
+Improved Fireball.jpg
+Impact.jpg
+Ignite.jpg
+Flame Throwing.jpg
+Improved Fire Blast.jpg
+Incinerate.jpg
+Improved Flamestrike.jpg
+Pyroblast.jpg
+Burning Soul.jpg
+Improved Scorch.jpg
+Improved Fire Ward.jpg
+Master of Elements.jpg
+Critical Mass.jpg
+Blast Wave.jpg
+Fire Power.jpg
+Combustion.jpg
+Frost Warding.jpg
+Improved Frostbolt.jpg
+Elemental Precision.jpg
+Ice Shards.jpg
+Frostbite.jpg
+Improved Frost Nova.jpg
+Permafrost.jpg
+Piercing Ice.jpg
+Cold Snap.jpg
+Improved Blizzard.jpg
+Arctic Reach.jpg
+Frost Channeling.jpg
+Shatter.jpg
+Ice Block.jpg
+Improved Cone of Cold.jpg
+Winter's Chill.jpg
+Ice Barrier.jpg

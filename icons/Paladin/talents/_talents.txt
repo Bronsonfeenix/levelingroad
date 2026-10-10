@@ -1,0 +1,47 @@
+Paladin talent icons. Save one image per talent in this folder, named exactly like the talent:
+<Talent Name>.jpg (or .png). Leave out characters Windows can't use, such as ':'. Talents without an icon show an emoji instead.
+
+Divine Strength.jpg
+Divine Intellect.jpg
+Spiritual Focus.jpg
+Improved Seal of Righteousness.jpg
+Healing Light.jpg
+Consecration.jpg
+Improved Lay on Hands.jpg
+Unyielding Faith.jpg
+Illumination.jpg
+Improved Blessing of Wisdom.jpg
+Divine Favor.jpg
+Lasting Judgement.jpg
+Holy Power.jpg
+Holy Shock.jpg
+Improved Devotion Aura.jpg
+Redoubt.jpg
+Precision.jpg
+Guardian's Favor.jpg
+Toughness.jpg
+Blessing of Kings.jpg
+Improved Righteous Fury.jpg
+Shield Specialization.jpg
+Anticipation.jpg
+Improved Hammer of Justice.jpg
+Improved Concentration Aura.jpg
+Blessing of Sanctuary.jpg
+Reckoning.jpg
+One-Handed Weapon Specialization.jpg
+Holy Shield.jpg
+Improved Blessing of Might.jpg
+Benediction.jpg
+Improved Judgement.jpg
+Improved Seal of the Crusader.jpg
+Deflection.jpg
+Vindication.jpg
+Conviction.jpg
+Seal of Command.jpg
+Pursuit of Justice.jpg
+Eye for an Eye.jpg
+Improved Retribution Aura.jpg
+Two-Handed Weapon Specialization.jpg
+Sanctity Aura.jpg
+Vengeance.jpg
+Repentance.jpg

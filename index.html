@@ -3,19 +3,20 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Ironvale Idle</title>
-  <meta name="description" content="A classic-MMO inspired idle RPG. Grind, loot and level your warrior to 60.">
+  <title>The Leveling Road</title>
+  <meta name="description" content="A World of Warcraft Classic inspired idle RPG. Pick a faction, race and class, then grind, loot and talent your way to level 60.">
   <meta name="theme-color" content="#120d09">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚔️</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/wow-skin.css">
 </head>
 <body>
   <div class="app">
     <header class="topbar">
-      <div class="brand">⚔️ <span>Ironvale Idle</span></div>
+      <div class="brand">⚔️ <span>The Leveling Road</span></div>
       <div class="xpwrap">
         <div class="xpbar"><div class="xpfill" id="xpFill"></div><div class="xptext" id="xpText"></div></div>
       </div>
@@ -26,21 +27,30 @@
     <section class="stage" id="stage">
       <canvas id="game"></canvas>
 
-      <div class="frame player">
-        <div class="portrait">🛡️<span class="lvl" id="pLevel">1</span></div>
-        <div class="bars">
-          <div class="fname">Warrior</div>
-          <div class="bar hp"><div class="fill" id="pHp"></div><span id="pHpText"></span></div>
-          <div class="bar rage"><div class="fill" id="pRage"></div><span id="pRageText"></span></div>
+      <div class="hudleft">
+        <div class="frame player">
+          <div class="portrait"><span id="pIcon">⚔️</span><span class="lvl" id="pLevel">1</span></div>
+          <div class="bars">
+            <div class="fname" id="pName"></div>
+            <div class="bar hp"><div class="fill" id="pHp"></div><span id="pHpText"></span></div>
+            <div class="bar res" id="pResBar" data-res="rage"><div class="fill" id="pRes"></div><span id="pResText"></span></div>
+          </div>
         </div>
+        <div class="combo" id="combo"></div>
+        <div class="buffs" id="buffs"></div>
+        <div class="castbar hidden" id="cast"><div class="fill" id="castFill"></div><span id="castText"></span></div>
       </div>
 
-      <div class="frame target hidden" id="target">
-        <div class="bars">
-          <div class="fname"><span id="tName"></span> <span class="elitetag">Elite</span></div>
-          <div class="bar hp"><div class="fill" id="tHp"></div><span id="tHpText"></span></div>
+      <div class="hudright">
+        <div class="frame target hidden" id="target">
+          <div class="bars">
+            <div class="fname"><span id="tName"></span> <span class="elitetag">Elite</span></div>
+            <div class="bar hp"><div class="fill" id="tHp"></div><span id="tHpText"></span></div>
+            <div class="ttype" id="tType"></div>
+          </div>
+          <div class="portrait"><canvas id="tPortrait" width="128" height="128"></canvas><span class="lvl" id="tLevel">1</span></div>
         </div>
-        <div class="portrait">💀<span class="lvl" id="tLevel">1</span></div>
+        <div class="buffs right" id="tDebuffs"></div>
       </div>
 
       <div class="zonelabel" id="zoneLabel"></div>
@@ -48,7 +58,7 @@
       <div class="taphint" id="tapHint">Tap to strike!</div>
       <div class="death hidden" id="death">
         <div class="dtitle">You have died</div>
-        <div class="dsub">Returning to life in <span id="deathTimer">6</span>…</div>
+        <div class="dsub">Releasing spirit… returning from the Spirit Healer in <span id="deathTimer">6</span></div>
       </div>
     </section>
 
@@ -56,15 +66,19 @@
     <nav class="tabs" id="tabs"></nav>
     <section class="panel" id="panel"></section>
 
-    <footer class="foot">A fan-made idle RPG inspired by classic MMOs. Progress is saved in your browser.</footer>
+    <footer class="foot">A fan-made idle RPG inspired by World of Warcraft Classic. Not affiliated with Blizzard Entertainment. Progress is saved in your browser.</footer>
   </div>
 
+  <div class="create hidden" id="create"></div>
   <div class="tooltip hidden" id="tooltip"></div>
   <div class="toast" id="toast"></div>
   <div class="modal hidden" id="modal"></div>
 
   <script src="js/data.js"></script>
+  <script src="js/classes.js"></script>
+  <script src="js/talents.js"></script>
   <script src="js/render.js"></script>
+  <script src="js/assets.js"></script>
   <script src="js/game.js"></script>
 </body>
 </html>

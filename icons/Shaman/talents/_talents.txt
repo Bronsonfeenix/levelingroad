@@ -1,0 +1,49 @@
+Shaman talent icons. Save one image per talent in this folder, named exactly like the talent:
+<Talent Name>.jpg (or .png). Leave out characters Windows can't use, such as ':'. Talents without an icon show an emoji instead.
+
+Convection.jpg
+Concussion.jpg
+Earth's Grasp.jpg
+Elemental Warding.jpg
+Call of Flame.jpg
+Elemental Focus.jpg
+Reverberation.jpg
+Call of Thunder.jpg
+Improved Fire Totems.jpg
+Eye of the Storm.jpg
+Elemental Devastation.jpg
+Storm Reach.jpg
+Elemental Fury.jpg
+Lightning Mastery.jpg
+Elemental Mastery.jpg
+Ancestral Knowledge.jpg
+Shield Specialization.jpg
+Guardian Totems.jpg
+Thundering Strikes.jpg
+Improved Ghost Wolf.jpg
+Improved Lightning Shield.jpg
+Enhancing Totems.jpg
+Two-Handed Axes and Maces.jpg
+Anticipation.jpg
+Flurry.jpg
+Toughness.jpg
+Improved Weapon Totems.jpg
+Elemental Weapons.jpg
+Parry.jpg
+Weapon Mastery.jpg
+Stormstrike.jpg
+Improved Healing Wave.jpg
+Tidal Focus.jpg
+Improved Reincarnation.jpg
+Ancestral Healing.jpg
+Totemic Focus.jpg
+Nature's Guidance.jpg
+Healing Focus.jpg
+Totemic Mastery.jpg
+Healing Grace.jpg
+Restorative Totems.jpg
+Tidal Mastery.jpg
+Healing Way.jpg
+Nature's Swiftness.jpg
+Purification.jpg
+Mana Tide Totem.jpg

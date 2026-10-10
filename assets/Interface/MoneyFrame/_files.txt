@@ -1,0 +1,5 @@
+Files the game looks for in this folder (see ASSETS.md for sources):
+
+UI-GoldIcon.png
+UI-SilverIcon.png
+UI-CopperIcon.png

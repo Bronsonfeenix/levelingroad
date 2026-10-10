@@ -1,0 +1,17 @@
+Warlock spell icons. Save each as <Spell Name>.jpg (or .png). Leave out characters Windows can't use, such as ':'.
+
+Demon Skin.jpg   <- https://www.wowhead.com/classic/search?q=Demon%20Skin
+Summon Imp.jpg   <- https://www.wowhead.com/classic/search?q=Summon%20Imp
+Summon Voidwalker.jpg   <- https://www.wowhead.com/classic/search?q=Summon%20Voidwalker
+Demonic Sacrifice.jpg   <- https://www.wowhead.com/classic/search?q=Demonic%20Sacrifice
+Soul Link.jpg   <- https://www.wowhead.com/classic/search?q=Soul%20Link
+Drain Life.jpg   <- https://www.wowhead.com/classic/search?q=Drain%20Life
+Life Tap.jpg   <- https://www.wowhead.com/classic/search?q=Life%20Tap
+Dark Pact.jpg   <- https://www.wowhead.com/classic/search?q=Dark%20Pact
+Shadowburn.jpg   <- https://www.wowhead.com/classic/search?q=Shadowburn
+Conflagrate.jpg   <- https://www.wowhead.com/classic/search?q=Conflagrate
+Corruption.jpg   <- https://www.wowhead.com/classic/search?q=Corruption
+Curse of Agony.jpg   <- https://www.wowhead.com/classic/search?q=Curse%20of%20Agony
+Siphon Life.jpg   <- https://www.wowhead.com/classic/search?q=Siphon%20Life
+Immolate.jpg   <- https://www.wowhead.com/classic/search?q=Immolate
+Shadow Bolt.jpg   <- https://www.wowhead.com/classic/search?q=Shadow%20Bolt

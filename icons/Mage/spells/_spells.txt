@@ -1,0 +1,18 @@
+Mage spell icons. Save each as <Spell Name>.jpg (or .png). Leave out characters Windows can't use, such as ':'.
+
+Arcane Intellect.jpg   <- https://www.wowhead.com/classic/search?q=Arcane%20Intellect
+Frost Armor.jpg   <- https://www.wowhead.com/classic/search?q=Frost%20Armor
+Evocation.jpg   <- https://www.wowhead.com/classic/search?q=Evocation
+Ice Block.jpg   <- https://www.wowhead.com/classic/search?q=Ice%20Block
+Ice Barrier.jpg   <- https://www.wowhead.com/classic/search?q=Ice%20Barrier
+Mana Shield.jpg   <- https://www.wowhead.com/classic/search?q=Mana%20Shield
+Arcane Power.jpg   <- https://www.wowhead.com/classic/search?q=Arcane%20Power
+Combustion.jpg   <- https://www.wowhead.com/classic/search?q=Combustion
+Presence of Mind.jpg   <- https://www.wowhead.com/classic/search?q=Presence%20of%20Mind
+Pyroblast.jpg   <- https://www.wowhead.com/classic/search?q=Pyroblast
+Frost Nova.jpg   <- https://www.wowhead.com/classic/search?q=Frost%20Nova
+Blast Wave.jpg   <- https://www.wowhead.com/classic/search?q=Blast%20Wave
+Fire Blast.jpg   <- https://www.wowhead.com/classic/search?q=Fire%20Blast
+Arcane Missiles.jpg   <- https://www.wowhead.com/classic/search?q=Arcane%20Missiles
+Frostbolt.jpg   <- https://www.wowhead.com/classic/search?q=Frostbolt
+Fireball.jpg   <- https://www.wowhead.com/classic/search?q=Fireball

@@ -1,0 +1,54 @@
+Rogue talent icons. Save one image per talent in this folder, named exactly like the talent:
+<Talent Name>.jpg (or .png). Leave out characters Windows can't use, such as ':'. Talents without an icon show an emoji instead.
+
+Improved Eviscerate.jpg
+Remorseless Attacks.jpg
+Malice.jpg
+Ruthlessness.jpg
+Murder.jpg
+Improved Slice and Dice.jpg
+Relentless Strikes.jpg
+Improved Expose Armor.jpg
+Lethality.jpg
+Vile Poisons.jpg
+Improved Poisons.jpg
+Cold Blood.jpg
+Improved Kidney Shot.jpg
+Seal Fate.jpg
+Vigor.jpg
+Improved Gouge.jpg
+Improved Sinister Strike.jpg
+Lightning Reflexes.jpg
+Improved Backstab.jpg
+Deflection.jpg
+Precision.jpg
+Endurance.jpg
+Riposte.jpg
+Improved Sprint.jpg
+Improved Kick.jpg
+Dagger Specialization.jpg
+Dual Wield Specialization.jpg
+Mace Specialization.jpg
+Blade Flurry.jpg
+Sword Specialization.jpg
+Fist Weapon Specialization.jpg
+Weapon Expertise.jpg
+Aggression.jpg
+Adrenaline Rush.jpg
+Master of Deception.jpg
+Opportunity.jpg
+Sleight of Hand.jpg
+Elusiveness.jpg
+Camouflage.jpg
+Initiative.jpg
+Ghostly Strike.jpg
+Improved Ambush.jpg
+Setup.jpg
+Improved Sap.jpg
+Serrated Blades.jpg
+Heightened Senses.jpg
+Preparation.jpg
+Dirty Deeds.jpg
+Hemorrhage.jpg
+Deadliness.jpg
+Premeditation.jpg

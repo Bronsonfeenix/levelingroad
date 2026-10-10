@@ -1,0 +1,16 @@
+Shaman spell icons. Save each as <Spell Name>.jpg (or .png). Leave out characters Windows can't use, such as ':'.
+
+Rockbiter Weapon.jpg   <- https://www.wowhead.com/classic/search?q=Rockbiter%20Weapon
+Windfury Weapon.jpg   <- https://www.wowhead.com/classic/search?q=Windfury%20Weapon
+Lightning Shield.jpg   <- https://www.wowhead.com/classic/search?q=Lightning%20Shield
+Strength of Earth Totem.jpg   <- https://www.wowhead.com/classic/search?q=Strength%20of%20Earth%20Totem
+Elemental Mastery.jpg   <- https://www.wowhead.com/classic/search?q=Elemental%20Mastery
+Nature's Swiftness.jpg   <- https://www.wowhead.com/classic/search?q=Nature's%20Swiftness
+Mana Tide Totem.jpg   <- https://www.wowhead.com/classic/search?q=Mana%20Tide%20Totem
+Healing Wave.jpg   <- https://www.wowhead.com/classic/search?q=Healing%20Wave
+Stormstrike.jpg   <- https://www.wowhead.com/classic/search?q=Stormstrike
+Flame Shock.jpg   <- https://www.wowhead.com/classic/search?q=Flame%20Shock
+Earth Shock.jpg   <- https://www.wowhead.com/classic/search?q=Earth%20Shock
+Searing Totem.jpg   <- https://www.wowhead.com/classic/search?q=Searing%20Totem
+Chain Lightning.jpg   <- https://www.wowhead.com/classic/search?q=Chain%20Lightning
+Lightning Bolt.jpg   <- https://www.wowhead.com/classic/search?q=Lightning%20Bolt

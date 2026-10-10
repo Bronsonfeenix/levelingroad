@@ -1,0 +1,50 @@
+Druid talent icons. Save one image per talent in this folder, named exactly like the talent:
+<Talent Name>.jpg (or .png). Leave out characters Windows can't use, such as ':'. Talents without an icon show an emoji instead.
+
+Improved Wrath.jpg
+Nature's Grasp.jpg
+Improved Nature's Grasp.jpg
+Improved Entangling Roots.jpg
+Improved Moonfire.jpg
+Natural Weapons.jpg
+Natural Shapeshifter.jpg
+Improved Thorns.jpg
+Omen of Clarity.jpg
+Nature's Reach.jpg
+Vengeance.jpg
+Improved Starfire.jpg
+Nature's Grace.jpg
+Moonglow.jpg
+Moonfury.jpg
+Moonkin Form.jpg
+Ferocity.jpg
+Feral Aggression.jpg
+Feral Instinct.jpg
+Brutal Impact.jpg
+Thick Hide.jpg
+Feline Swiftness.jpg
+Feral Charge.jpg
+Sharpened Claws.jpg
+Improved Shred.jpg
+Predatory Strikes.jpg
+Blood Frenzy.jpg
+Primal Fury.jpg
+Savage Fury.jpg
+Faerie Fire (Feral).jpg
+Heart of the Wild.jpg
+Leader of the Pack.jpg
+Improved Mark of the Wild.jpg
+Furor.jpg
+Improved Healing Touch.jpg
+Nature's Focus.jpg
+Improved Enrage.jpg
+Reflection.jpg
+Insect Swarm.jpg
+Subtlety.jpg
+Tranquil Spirit.jpg
+Improved Rejuvenation.jpg
+Nature's Swiftness.jpg
+Gift of Nature.jpg
+Improved Tranquility.jpg
+Improved Regrowth.jpg
+Swiftmend.jpg
