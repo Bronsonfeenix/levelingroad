@@ -70,7 +70,7 @@ function shuffled(a) { const b = a.slice(); for (let i = b.length - 1; i > 0; i-
 const MUSIC_MIN_GENERAL = 3;
 function musicPlaylist(ctx) {
   const own = shuffled(MUSIC[ctx]);
-  if (ctx === 'select') return own;
+  if (ctx === 'select' || ctx.startsWith('dng_')) return own;   // menus and dungeons keep to their own music
   const extra = shuffled(MUSIC_GENERAL.filter(t => !own.includes(t))).slice(0, Math.max(own.length, MUSIC_MIN_GENERAL));
   const list = [];
   for (let i = 0; i < Math.max(own.length, extra.length); i++) {
@@ -159,7 +159,7 @@ function musicSetUnfocused(on) { musicSettings().muteUnfocused = !!on; musicSave
 
 function musicNowPlaying() {
   if (!MUS.track) return 'Nothing';
-  const where = MUS.ctx === 'select' ? 'Character Select' : ((typeof ZONES !== 'undefined' && ZONES.find(z => z.id === MUS.ctx)) || {}).name || '';
+  const where = MUS.ctx === 'select' ? 'Character Select' : MUS.ctx.startsWith('dng_') ? (dungeonById(MUS.ctx.slice(4)) || {}).name : ((typeof ZONES !== 'undefined' && ZONES.find(z => z.id === MUS.ctx)) || {}).name || '';
   return trackTitle(MUS.track) + (where ? ` (${where})` : '');
 }
 

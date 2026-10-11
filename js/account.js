@@ -23,7 +23,7 @@ function freshAccount() {
 }
 
 function charSummary(id, d) {
-  return { id, name: d.name, race: d.race, cls: d.cls, faction: d.faction, level: d.level, zoneId: d.zoneId, lastPlayed: d.lastSeen || Date.now() };
+  return { id, name: d.name, title: d.title || null, race: d.race, cls: d.cls, faction: d.faction, level: d.level, zoneId: d.zoneId, lastPlayed: d.lastSeen || Date.now() };
 }
 
 // Load the account. The first time, the old single-character save becomes character 1
@@ -92,7 +92,8 @@ function deleteCharacter(id) {
 // Bonuses every character on the account gets (merged into gatherFx in game.js)
 function accountFx() {
   const at60 = ACC ? ACC.characters.filter(c => c.level >= CONFIG.LEVEL_CAP).length : 0;
-  return { xp: Math.min(LEGACY_XP_CAP, at60 * LEGACY_XP_PER_60) };
+  const c = typeof collectionFx === 'function' ? collectionFx() : {}, a = typeof achFx === 'function' ? achFx() : {};
+  return { xp: Math.min(LEGACY_XP_CAP, at60 * LEGACY_XP_PER_60) + (c.xp || 0) + (a.xp || 0), travel: c.travel || 0, gold: (c.gold || 0) + (a.gold || 0) };
 }
 
 // Export / import the whole account (all characters) as one code

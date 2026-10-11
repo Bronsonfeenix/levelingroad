@@ -1,0 +1,10 @@
+Files the game looks for in this folder (see ASSETS.md for sources):
+
+UI-Achievement-Alert-Background.png
+UI-Achievement-Parchment-Horizontal.png
+UI-Achievement-Parchment-Horizontal-Desaturated.png
+UI-Achievement-Shield.png
+UI-Achievement-Shield-Desaturated.png
+UI-Achievement-IconFrame.png
+UI-Achievement-ProgressBar-Border.png
+UI-Achievement-Criteria-Check.png

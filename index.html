@@ -27,6 +27,7 @@
     <!-- Battlefield: hero on the left, enemies approach from the right -->
     <section class="stage" id="stage">
       <canvas id="game"></canvas>
+      <canvas id="fxText"></canvas>
 
       <div class="hudleft">
         <div class="frame player">
@@ -39,6 +40,7 @@
         </div>
         <div class="combo" id="combo"></div>
         <div class="buffs" id="buffs"></div>
+        <div class="party hidden" id="party"></div>
         <div class="castbar hidden" id="cast"><div class="fill" id="castFill"></div><span id="castText"></span></div>
       </div>
 
@@ -48,6 +50,7 @@
             <div class="fname"><span id="tName"></span> <span class="elitetag">Elite</span></div>
             <div class="bar hp"><div class="fill" id="tHp"></div><span id="tHpText"></span></div>
             <div class="ttype" id="tType"></div>
+            <div class="tcast hidden" id="tCast"><div class="fill" id="tCastFill"></div><span id="tCastText"></span></div>
           </div>
           <div class="portrait"><canvas id="tPortrait" width="128" height="128"></canvas><span class="lvl" id="tLevel">1</span></div>
         </div>
@@ -56,6 +59,8 @@
       </div>
 
       <div class="zonelabel" id="zoneLabel"></div>
+      <div class="dprog hidden" id="dprog"></div>
+      <div class="achtoast" id="achToast"></div>
       <div class="zonebanner" id="zoneBanner"></div>
       <div class="taphint" id="tapHint">Tap to strike!</div>
       <div class="uierror" id="uiError"></div>
@@ -83,11 +88,18 @@
   <script src="js/data.js"></script>
   <script src="js/classes.js"></script>
   <script src="js/talents.js"></script>
+  <script src="js/gearlook.js"></script>
   <script src="js/render.js"></script>
+  <script src="js/pixelfx.js"></script>
   <script src="js/assets.js"></script>
   <script src="js/account.js"></script>
   <script src="js/quests.js"></script>
   <script src="js/music.js"></script>
+  <script src="js/instances.js"></script>
+  <script src="js/raids.js"></script>
+  <script src="js/party.js"></script>
+  <script src="js/collections.js"></script>
+  <script src="js/achievements.js"></script>
   <script src="js/game.js"></script>
 </body>
 </html>

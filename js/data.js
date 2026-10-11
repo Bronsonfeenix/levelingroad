@@ -21,6 +21,7 @@ const CONFIG = {
   APPROACH_SPEED: 340,     // how fast enemies close in on screen (px/s)
   TALENT_START: 10,        // first level that grants a talent point
   GCD: 1.5,                // global cooldown (energy users: 1.0)
+  PIXEL: 3,                // pixel-art look: logical units per screen pixel (0 = smooth)
 };
 
 // ---------------------------------------------------------------------
@@ -411,7 +412,6 @@ const PROFESSIONS = [
   { id: 'firstaid',      name: 'First Aid',     icon: '🩹', base: 40,  growth: 1.28, max: 40, desc: r => `Linen to Runecloth Bandages: +${10 * r}% health regeneration` },
   { id: 'inn',           name: 'Rested at the Inn', icon: '🍺', base: 100, growth: 1.38, max: 40, desc: r => `Rested bonus: +${5 * r}% experience` },
   { id: 'skinning',      name: 'Skinning',      icon: '🔪', base: 80,  growth: 1.33, max: 40, desc: r => `+${8 * r}% gold from kills` },
-  { id: 'riding',        name: 'Riding',        icon: '🐎', base: 150, growth: 1.6,  max: 10, minLevel: 40, desc: r => `Mounted: +${6 * r}% travel and spawn speed` },
   { id: 'gathering',     name: 'Herbalism & Mining', icon: '🌿', base: 200, growth: 1.5, max: 20, desc: r => `+${5 * r}% loot drop chance` },
 ];
 

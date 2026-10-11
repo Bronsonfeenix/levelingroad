@@ -36,6 +36,14 @@ const UI_ASSETS = {
   loadAlliance:  'assets/Interface/Glues/LoadingScreens/LoadScreenEasternKingdom',
   loadHorde:     'assets/Interface/Glues/LoadingScreens/LoadScreenKalimdor',
   questBg:       'assets/Interface/QuestFrame/QuestBG',
+  achAlert:      'assets/Interface/AchievementFrame/UI-Achievement-Alert-Background',
+  achParch:      'assets/Interface/AchievementFrame/UI-Achievement-Parchment-Horizontal',
+  achParchGrey:  'assets/Interface/AchievementFrame/UI-Achievement-Parchment-Horizontal-Desaturated',
+  achShield:     'assets/Interface/AchievementFrame/UI-Achievement-Shield',
+  achShieldGrey: 'assets/Interface/AchievementFrame/UI-Achievement-Shield-Desaturated',
+  achIconFrame:  'assets/Interface/AchievementFrame/UI-Achievement-IconFrame',
+  achBar:        'assets/Interface/AchievementFrame/UI-Achievement-ProgressBar-Border',
+  achCheck:      'assets/Interface/AchievementFrame/UI-Achievement-Criteria-Check',
 };
 const TEXTURE_EXTS = ['.png', '.PNG', '.jpg'];
 const ICON_EXTS = ['.jpg', '.png'];

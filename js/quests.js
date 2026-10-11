@@ -210,7 +210,7 @@ function questRewards(q) {
   const rare = q.type === 'elite' || zq[zq.length - 1] === q;
   const n = rare ? 3 : 2, slots = [];
   while (slots.length < n) { const s = pickItemSlot(); if (!slots.includes(s) && !COSMETIC_SLOTS.includes(s)) slots.push(s); }
-  return slots.map(s => { const it = makeItem(Math.max(q.level + 1, 2), rare ? 3 : 2, s); it.req = Math.min(it.req, S.level); return it; });
+  return slots.map(s => { const it = makeItem(Math.max(q.level + 1, 2), rare ? 3 : 2, s, { src: q.zone }); it.req = Math.min(it.req, S.level); return it; });
 }
 
 function completeQuest(id) {
@@ -238,6 +238,7 @@ function turnInQuest(id, choice) {
   const it = st.rewards && st.rewards[choice || 0];
   delete S.quests[id];
   S.questsDone.push(id);
+  achOnQuest();
   let msg = `Quest turned in: <b class="quest">${esc(q.name)}</b>. Received ${moneyText(gold)}`;
   if (it) {
     if (S.bag.length < CONFIG.BAG_SIZE) { S.bag.push(it); msg += ` and ${itemLink(it)}`; }

@@ -1,0 +1,26 @@
+Mount icons (optional), named like the mount:
+
+Brown Horse.jpg
+Swift Palomino.jpg
+Gray Ram.jpg
+Swift Gray Ram.jpg
+Striped Nightsaber.jpg
+Swift Frostsaber.jpg
+Red Mechanostrider.jpg
+Swift Green Mechanostrider.jpg
+Timber Wolf.jpg
+Swift Timber Wolf.jpg
+Brown Kodo.jpg
+Great Brown Kodo.jpg
+Emerald Raptor.jpg
+Swift Olive Raptor.jpg
+Red Skeletal Horse.jpg
+Purple Skeletal Warhorse.jpg
+Warhorse.jpg
+Charger.jpg
+Felsteed.jpg
+Dreadsteed.jpg
+Deathcharger's Reins.jpg
+Swift Razzashi Raptor.jpg
+Swift Zulian Tiger.jpg
+Black Qiraji Battle Tank.jpg

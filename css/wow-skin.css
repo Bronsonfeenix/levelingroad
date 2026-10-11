@@ -173,3 +173,26 @@ img.cf-img { width: 30px; height: 30px; border-radius: 5px; }
 
 /* ---------- quest log: QuestBG parchment (the page fills 300×335 of the 512×512 texture) ---------- */
 .has-questBg .qdetail { background: var(--a-questBg) 0 0 / 170.67% 152.84% no-repeat; box-shadow: none; }
+
+/* Boss cast bar under the target frame */
+.has-targetFrame .frame .tcast { position: absolute; left: 10px; top: 82px; width: 111px; margin: 0; z-index: 3; }
+.has-rock .dcard { background-color: rgba(0,0,0,.5); }
+
+/* ---------- achievements (Wrath-era achievement frame art) ---------- */
+/* Alert background: the art fills 310×90 of the 512×128 texture */
+.has-achAlert .achtoast { background: var(--a-achAlert) 0 0 / 165.16% 142.22% no-repeat; border: 0; border-radius: 0; box-shadow: none; }
+.has-achAlert .at-ico { margin-left: 10px; width: 40px; height: 40px; border: 0; border-radius: 2px; }
+.has-achParch .ach.done { background: var(--a-achParch) center / cover; }
+.has-achParchGrey .achlist .ach:not(.done) { background: linear-gradient(rgba(0,0,0,.25), rgba(0,0,0,.25)), var(--a-achParchGrey) center / cover; }
+.has-achParchGrey .ach.done { filter: none; }
+/* Shield with the points (whole 128×128 texture) */
+.has-achShield .ach-shield, .has-achShield .at-pts { background: var(--a-achShield) center / 150% 150% no-repeat; }
+.has-achShieldGrey .ach:not(.done) .ach-shield { background-image: var(--a-achShieldGrey); }
+/* Icon frame: the frame fills 72×72 of the 128×128 texture */
+.has-achIconFrame .ach-ico { position: relative; border: 0; }
+.has-achIconFrame .ach-ico::after { content: ''; position: absolute; inset: -4px; background: var(--a-achIconFrame) 0 0 / 177.78% 177.78% no-repeat; pointer-events: none; }
+/* Progress bar border: 224×24 of 256×32 */
+.has-achBar .ach-bar { border: 0; border-radius: 0; overflow: visible; }
+.has-achBar .ach-bar::after { content: ''; position: absolute; inset: -3px -4px; background: var(--a-achBar) 0 0 / 114.29% 133.33% no-repeat; pointer-events: none; }
+.has-achCheck .ach-crit span.ok::before { content: ''; display: inline-block; width: 12px; height: 12px; margin-right: 3px; vertical-align: -1px; background: var(--a-achCheck) 0 0 / 200% 100% no-repeat; }
+.has-achParchGrey .ach, .has-achParchGrey .ach.done { filter: none; }

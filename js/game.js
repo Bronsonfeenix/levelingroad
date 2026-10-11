@@ -51,6 +51,7 @@ const G = {        // runtime-only state
   dead: false, deadTimer: 0, levelFx: 0,
   fct: [], particles: [], weather: [], weatherType: null,
   tab: 'character', tree: 0, talSel: null, dirty: true, refreshT: 0, saveT: 0, selected: null, hud: {},
+  fxCanvas: null, fxCtx: null, fxScale: 1,
   create: null, select: null,
 };
 
@@ -63,7 +64,7 @@ function freshState() {
     zoneId: null, autoZone: true, autoSell: 1, numbers: true, autoTrain: true,
     kills: 0, elites: 0, deaths: 0, earned: 0, playTime: 0,
     rate: { xp: 0, copper: 0, kills: 0, time: 0 },
-    quests: {}, questsDone: [], autoQuest: true,
+    quests: {}, questsDone: [], autoQuest: true, dungeons: {}, autoDungeon: false, riding: 0, mount: null, companion: null, title: null, zonesSeen: [],
     lastSeen: Date.now(), nextId: 1, log: [], welcomed: false,
   };
 }
@@ -82,6 +83,11 @@ function applySave(d) {
   S.rate = Object.assign({ xp: 0, copper: 0, kills: 0, time: 0 }, d.rate || {});
   if (!zonesForChar().some(z => z.id === S.zoneId)) S.zoneId = race().start;
   resetRuntime();
+  migrateRiding();
+  seedZonesSeen();
+  // Items from before gear had a source get the zone matching their level (for their look)
+  for (const it of [...S.bag, ...Object.values(S.equipment)]) if (it && !it.src) it.src = it.ilvl <= 1 ? 'starter' : srcForLevel(it.ilvl, zonesForChar());
+  if (S.equipment.tabard) collectTabard(S.equipment.tabard);
   // Buffs keep ticking while you're away
   const away = Math.max(0, (Date.now() - (d.lastSeen || Date.now())) / 1000);
   for (const b of S.savedBuffs || []) { const ab = abById(b.id); if (ab && ab.kind === 'buff' && knownRanks(ab) && b.left - away > 0) applyManualBuff(ab, b.left - away); }
@@ -90,7 +96,8 @@ function applySave(d) {
 
 function resetRuntime() {
   STATS = null; ABIL = null; GRANTS = null;
-  Object.assign(G, { enemy: null, dead: false, cast: null, cds: {}, cdMax: {}, buffs: [], procs: {}, proj: [], gcd: 0, spawnTimer: 1, weather: [], queued: null });
+  Object.assign(G, { enemy: null, dead: false, cast: null, cds: {}, cdMax: {}, buffs: [], procs: {}, proj: [], gcd: 0, spawnTimer: 1, weather: [], queued: null, run: null, feared: 0, party: null, partyRole: null, frontX: null, draft: null, achEarned: null, achT: 0 });
+  G.heroX = clamp(G.W * 0.16, 80, 180);
 }
 
 function save() {
@@ -110,6 +117,8 @@ function invalidate() { STATS = null; GRANTS = null; }
 
 function zonesForChar() { return ZONES.filter(z => z.races ? z.races.includes(S.race) : (z.faction === 'both' || z.faction === S.faction)); }
 const zone = () => ZONES.find(z => z.id === S.zoneId) || ZONES.find(z => z.id === race().start);
+// What the battlefield shows: the dungeon you're in, otherwise your zone
+const scene = () => (G.run && dungeonScene()) || zone();
 
 function abilities() {
   const key = S.cls + S.race;
@@ -132,6 +141,18 @@ function talentGrants() {
   GRANTS = new Set();
   for (const tr of trees()) for (const t of tr.talents) if (tRank(t.id) > 0 && t.fx.grants) GRANTS.add(t.fx.grants);
   return GRANTS;
+}
+// Spend all talent points, mostly in one tree, going as deep as possible (used for dungeon bots)
+function autoSpendTalents(spec) {
+  let guard = 100;
+  while (talentPoints() > 0 && guard--) {
+    let done = false;
+    for (const ti of [spec, (spec + 1) % 3, (spec + 2) % 3]) {
+      const t = trees()[ti].talents.slice().sort((a, b) => b.tier - a.tier || (b.fx.grants ? 1 : 0) - (a.fx.grants ? 1 : 0)).find(canLearnTalent);
+      if (t) { S.talents[t.id] = tRank(t.id) + 1; invalidate(); done = true; break; }
+    }
+    if (!done) break;
+  }
 }
 function canLearnTalent(t) {
   if (S.level < CONFIG.TALENT_START || talentPoints() <= 0 || tRank(t.id) >= t.max) return false;
@@ -248,6 +269,7 @@ function gatherFx() {
   const fx = newFx();
   addFx(fx, race().racial.fx, 1);
   addFx(fx, accountFx(), 1); // account-wide bonuses (legacy XP, later achievements, collections, heirlooms)
+  addFx(fx, setBonusFx(), 1); // tier set bonuses (raids.js)
   for (const tr of trees()) for (const t of tr.talents) { const r = tRank(t.id); if (r) addFx(fx, t.fx, r); }
   for (const ab of abilities()) {
     if (!auraActive(ab)) continue;
@@ -308,7 +330,7 @@ function calc() {
     xpMult: CONFIG.XP_RATE * (1 + 0.05 * prof('inn')) * (1 + f('xp')),
     goldMult: CONFIG.GOLD_RATE * (1 + 0.08 * prof('skinning')) * (1 + f('gold')),
     loot: (1 + 0.05 * prof('gathering')) * (1 + f('loot')),
-    travel: (1 + 0.06 * prof('riding')) * (1 + f('travel')),
+    travel: (1 + mountSpeed()) * (1 + f('travel')),
     instant: f('instant') > 0, free: f('free') > 0,
   };
   return STATS;
@@ -344,7 +366,11 @@ function makeCosmetic(ilvl, q, slot) {
   return { id: S.nextId++, slot, ilvl, q: Math.min(q, 2), req: 1, stats: {}, armor: 0, dmg: 0, name: L.names[i], color: L.colors[i], sell: Math.max(1, Math.round(ilvl * 2 + 5)) };
 }
 
-function makeItem(ilvl, q, slot) {
+// Where new loot comes from (drives its look, see gearlook.js): the dungeon you're in, otherwise your zone
+const currentSrc = () => (G.run && G.run.id) || (S && S.zoneId) || 'starter';
+// o (optional): { name, wtype, otype, atype, src } to make a specific named item, e.g. dungeon boss loot
+function makeItem(ilvl, q, slot, o) {
+  o = o || {};
   slot = slot || pickItemSlot();
   if (slot === 'offhand' && !cls().offhands.length) slot = 'weapon';
   if (COSMETIC_SLOTS.includes(slot)) return makeCosmetic(ilvl, q, slot);
@@ -352,10 +378,10 @@ function makeItem(ilvl, q, slot) {
   const Q = QUALITIES[q];
   const tier = clamp(Math.floor((ilvl - 1) / 12), 0, 4);
   const req = Math.max(1, Math.min(CONFIG.LEVEL_CAP, ilvl - 2));
-  const it = { id: S.nextId++, slot, ilvl, q, req, stats: {}, armor: 0, dmg: 0 };
+  const it = { id: S.nextId++, slot, ilvl, q, req, stats: {}, armor: 0, dmg: 0, src: o.src || currentSrc() };
   let base, plain, epics;
-  if (slot === 'weapon') it.wtype = pick(cls().weapons);
-  else if (slot === 'offhand') { const o = pick(cls().offhands); if (WEAPON_TYPES[o]) it.wtype = o; else it.otype = o; }
+  if (slot === 'weapon') it.wtype = o.wtype || pick(cls().weapons);
+  else if (slot === 'offhand') { const oh = o.otype || o.wtype || pick(cls().offhands); if (WEAPON_TYPES[oh]) it.wtype = oh; else it.otype = oh; }
   if (it.wtype) {
     const WT = WEAPON_TYPES[it.wtype];
     base = plain = WT.bases[tier];
@@ -370,7 +396,7 @@ function makeItem(ilvl, q, slot) {
     base = plain = pick(JEWELRY[slot]);
     epics = EPIC_ARMOR[slot];
   } else {
-    it.atype = armorTypeFor(req);
+    it.atype = o.atype || armorTypeFor(req);
     const AT = ARMOR_TYPES[it.atype];
     base = AT.nouns[slot];
     plain = AT.mats[tier] + ' ' + base;
@@ -388,14 +414,14 @@ function makeItem(ilvl, q, slot) {
     for (const suf of sufs) for (const k in suf.stats) it.stats[k] = (it.stats[k] || 0) + Math.max(1, Math.round(budget * suf.stats[k] / sufs.length));
     if (q === 2) name += ' ' + sufs[0].name;
   }
-  it.name = name;
+  it.name = o.name || name;
   it.sell = Math.max(1, Math.round((ilvl * ilvl * 0.3 + ilvl * 3 + 3) * Q.sell));
   return it;
 }
 
 function giveStarterGear() {
   for (const s of cls().starter) {
-    const it = { id: S.nextId++, slot: s.slot, ilvl: 1, req: 1, q: 1, name: s.name, stats: {}, sell: 3, armor: 0, dmg: 0 };
+    const it = { id: S.nextId++, slot: s.slot, ilvl: 1, req: 1, q: 1, name: s.name, stats: {}, sell: 3, armor: 0, dmg: 0, src: 'starter' };
     if (s.slot === 'weapon') { it.wtype = s.wtype; it.dmg = Math.round(6 * WEAPON_TYPES[s.wtype].dmg); }
     else { it.atype = armorTypeFor(1); it.armor = Math.round(10 * ARMOR_TYPES[it.atype].mult); }
     S.equipment[s.slot] = it;
@@ -447,6 +473,7 @@ function equip(id) {
   const old = S.equipment[slot];
   if (old) S.bag.push(old);
   S.equipment[slot] = it;
+  collectTabard(it);
   if (G.selected === it.id) G.selected = old ? old.id : null;
   invalidate(); markDirty();
 }
@@ -493,7 +520,7 @@ function equipBest(quiet) {
 // ---------- combat: helpers ----------
 function fightX() {
   const e = G.enemy;
-  return G.heroX + 118 + (e ? (e.def.size * (e.elite ? 1.25 : 1) - 1) * 50 : 0);
+  return (G.frontX || G.heroX) + 118 + (e ? (e.def.size * (e.elite ? 1.25 : 1) - 1) * 50 : 0);
 }
 const enemyY = e => G.groundY - 55 * e.def.size * (e.elite ? 1.25 : 1);
 const alive = e => !!e && e.state !== 'dying' && e.hp > 0;
@@ -772,6 +799,8 @@ function engage(e, st) {
 }
 
 function spawnEnemy() {
+  if (G.run) { spawnDungeonEnemy(); return; }
+  if (S.autoDungeon) { const d = autoDungeonPick(); if (d && startDungeon(d.id, true)) return; }
   const z = zone(), L = S.level;
   let lv;
   if (L >= z.min && L <= z.max) lv = clamp(L + randi(-2, 1), z.min, z.max);
@@ -794,39 +823,58 @@ function spawnEnemy() {
 
 function enemyAttack(st, e) {
   e.lunge = 1;
+  // In a dungeon group the enemy hits its target (normally the tank)
+  if (G.party) {
+    const m = enemyTarget(e);
+    if (!m) return;
+    const lvRef = m.player ? S.level : m.level;
+    let raw = enemyDamage(e.lv) * (e.dmgMult || 1) * rand(0.85, 1.15);
+    if (e.lv > lvRef) raw *= 1 + 0.12 * (e.lv - lvRef);
+    partyHit(m, raw, e, false);
+    if (m.player && !G.dead && fxv(st, 'thorns') && alive(e)) damage(e, st.H * fxv(st, 'thorns'), S.cls === 'paladin' ? 'holy' : 'nature', { noCrit: true, noProc: true, spell: true });
+    return;
+  }
   if (Math.random() < st.dodge) {
     if (S.numbers) fct(G.heroX, G.groundY - 150, 'Dodge', '#9fd3ff', 15);
     G.procs.dodge = 5;
     return;
   }
-  let d = enemyDamage(e.lv) * (e.elite ? 1.8 : 1) * rand(0.85, 1.15);
+  let d = enemyDamage(e.lv) * (e.dmgMult || (e.elite ? 1.8 : 1)) * rand(0.85, 1.15);
   const diff = e.lv - S.level;
   if (diff > 0) d *= 1 + 0.12 * diff;
   d = Math.max(1, Math.round(d * (1 - mitigation(st.armor, e.lv)) * st.dmgTaken));
+  hitHero(d, e);
+  if (!G.dead && fxv(st, 'thorns') && alive(e)) damage(e, st.H * fxv(st, 'thorns'), S.cls === 'paladin' ? 'holy' : 'nature', { noCrit: true, noProc: true, spell: true });
+}
+
+// Damage that reaches the hero (after armor): shields absorb first. label = a boss ability's name.
+function hitHero(d, e, label) {
+  const st = calc();
   for (const b of G.buffs) {
     if (b.absorb > 0 && d > 0) { const a = Math.min(b.absorb, d); b.absorb -= a; d -= a; if (S.numbers && a) fct(G.heroX - 20, G.groundY - 130, `Absorb ${fmt(a)}`, '#c8e6ff', 13); }
   }
   if (d > 0) {
     S.hp -= d; G.hurt = 1;
     if (cls().resource === 'rage' && !isCat()) S.res = Math.min(100, S.res + 4 * (1 + fxv(st, 'resGen')));
-    if (S.numbers) fct(G.heroX + rand(-10, 10), G.groundY - 150, '-' + fmt(d), '#ff4d4d', 17);
+    if (S.numbers) fct(G.heroX + rand(-10, 10), G.groundY - 150, '-' + fmt(d), '#ff4d4d', label ? 21 : 17);
   }
-  if (fxv(st, 'thorns') && alive(e)) damage(e, st.H * fxv(st, 'thorns'), S.cls === 'paladin' ? 'holy' : 'nature', { noCrit: true, noProc: true, spell: true });
+  if (label) fct(G.heroX + 10, G.groundY - 178, label, '#ffb070', 14);
   if (S.hp <= 0) die(e);
 }
 
 function killEnemy(e, st) {
   e.state = 'dying'; e.dying = 0;
   S.kills++; if (e.elite) S.elites++;
-  const xp = S.level >= CONFIG.LEVEL_CAP ? 0 : Math.round(xpForKill(e.lv, S.level) * (e.elite ? 2.5 : 1) * st.xpMult);
-  const cop = Math.max(1, Math.round(copperForKill(e.lv) * (e.elite ? 3 : 1) * st.goldMult));
+  const xp = S.level >= CONFIG.LEVEL_CAP ? 0 : Math.round(xpForKill(e.lv, S.level) * (e.xpMult || (e.elite ? 2.5 : 1)) * st.xpMult);
+  const cop = Math.max(1, Math.round(copperForKill(e.lv) * (e.goldMult || (e.elite ? 3 : 1)) * st.goldMult));
   S.copper += cop; S.earned += cop;
   S.rate.xp += xp; S.rate.copper += cop; S.rate.kills++;
   const ey = G.groundY - 120 * e.def.size;
   if (xp) fct(e.x, ey, `+${fmt(xp)} XP`, '#c58cff', 16, 0.15);
   fct(e.x, ey + 20, '+' + moneyText(cop), '#ffd75a', 14, 0.3);
   burst(e.x, G.groundY - 40, e.def.color, 14);
-  if (Math.random() < (e.elite ? 1 : CONFIG.BASE_LOOT_CHANCE * st.loot)) dropLoot(e);
+  // Dungeon bosses drop their own loot (see dungeonOnKill); dungeon trash drops a little more often
+  if (!e.boss && Math.random() < (e.elite ? 1 : CONFIG.BASE_LOOT_CHANCE * st.loot * (e.lootMult || 1))) dropLoot(e);
   if (e.elite) log(`Slain: <b class="elite">${esc(e.def.name)}</b> (Elite)`, 'kill');
   if (fxv(st, 'onKillHeal')) healHero(st.maxHp * fxv(st, 'onKillHeal'), false, true);
   if (xp && Math.random() < fxv(st, 'spiritTap')) addBuff({ id: 'spirit_tap', name: 'Spirit Tap', icon: '👻', left: 15, max: 15, fx: { manaRegen: 1 } });
@@ -834,6 +882,9 @@ function killEnemy(e, st) {
   if (!keepsCombo()) S.combo = 0;
   if (xp) addXp(xp);
   questsOnKill(e);
+  collectionDropsOnKill(e);
+  achOnKill(e);
+  if (e.dng) dungeonOnKill(e);
 }
 
 function dropLoot(e) {
@@ -847,6 +898,7 @@ function dropLoot(e) {
   }
   S.bag.push(it);
   log(`You receive loot: ${itemLink(it)}${isUpgrade(it) ? ' <span class="up">▲ upgrade</span>' : ''}`, 'loot');
+  collectTabard(it);
   markDirty();
 }
 
@@ -856,6 +908,8 @@ function die(e) {
   log(`You were slain by <b>${esc(e.def.name)}</b> (level ${e.lv}).`, 'death');
   G.enemy = null; G.spawnTimer = 1.5; G.cast = null; G.proj = [];
   G.buffs = []; invalidate();
+  achOnDeath();
+  if (G.run) endDungeon('wipe');
   markDirty();
 }
 
@@ -884,6 +938,7 @@ function addXp(n, quiet) {
     if (S.level === 40 && cls().armor[0] !== cls().armor[1]) log(`You can now wear <b>${ARMOR_TYPES[cls().armor[1]].name}</b> armor.`, 'sys');
     if (S.level === CONFIG.LEVEL_CAP) log('<b class="ding">You have reached level 60. Your journey on the Leveling Road is complete!</b>', 'level');
     if (S.autoZone) autoPickZone(quiet);
+    achSoon();
     acceptZoneQuests(quiet);
     markDirty();
   }
@@ -891,6 +946,7 @@ function addXp(n, quiet) {
 }
 
 function autoPickZone(quiet) {
+  if (G.run) return;   // checked again when the dungeon run ends
   const best = zonesForChar().filter(z => z.min <= S.level).pop();
   const cur = zone();
   // Finish the zone's open quests first, unless they've become trivial
@@ -903,7 +959,9 @@ function zoneUnlocked(z) { return S.level >= z.min - 3; }
 function travel(id, quiet) {
   const z = zonesForChar().find(x => x.id === id);
   if (!z || !zoneUnlocked(z) || z.id === S.zoneId) return;
+  if (G.run) endDungeon('leave');
   S.zoneId = z.id;
+  noteZone(z.id);
   acceptZoneQuests(quiet);
   G.enemy = null; G.spawnTimer = 1; G.weather = []; G.cast = null; G.proj = [];
   showZoneBanner();
@@ -924,6 +982,8 @@ function update(dt) {
   G.levelFx = Math.max(0, G.levelFx - dt);
   G.gcd = Math.max(0, G.gcd - dt);
   G.wandFx = Math.max(0, G.wandFx - dt);
+  G.feared = Math.max(0, (G.feared || 0) - dt);
+  if (G.run) { G.run.t += dt; dungeonPotion(st); }
   if (G.heroSwing >= 0) { G.heroSwing += dt / 0.36; if (G.heroSwing >= 1) G.heroSwing = -1; }
   if (G.shoot >= 0) { G.shoot += dt / 0.4; if (G.shoot >= 1) G.shoot = -1; }
   for (const k in G.cds) G.cds[k] = Math.max(0, G.cds[k] - dt);
@@ -961,7 +1021,7 @@ function update(dt) {
   if (st.rt === 'energy') S.res = Math.min(st.maxRes, S.res + 10 * (1 + fxv(st, 'resGen')) * dt);
   if (st.rt === 'rage') S.res = fighting ? Math.min(100, S.res + fxv(st, 'rageRegen') * dt) : Math.max(0, S.res - dt * 4);
 
-  G.walking = !e || e.state === 'approach';
+  G.walking = (!e && !(G.run && G.run.rest > 0)) || (!!e && e.state === 'approach');
   if (G.walking) G.cam += CONFIG.WALK_SPEED * st.travel * dt;
 
   if (!e) {
@@ -981,13 +1041,16 @@ function update(dt) {
       e.x -= e.speed * st.travel * dt;
       if (e.x <= fightX()) { e.x = fightX(); e.state = 'fight'; engage(e, st); }
     } else if (e.state === 'fight') {
-      if (e.stun <= 0) { e.atk -= dt; if (e.atk <= 0) { e.atk += 2; enemyAttack(st, e); } }
+      if (e.boss) bossTick(e, dt, st);
+      // A boss busy casting doesn't swing
+      if (G.enemy === e && e.stun <= 0 && !e.cast) { e.atk -= dt; if (e.atk <= 0) { e.atk += e.atkSpeed || 2; enemyAttack(st, e); } }
     } else if (e.state === 'dying') {
       e.dying += dt;
       if (e.dying > 0.6) { G.enemy = null; G.spawnTimer = CONFIG.SPAWN_DELAY; }
     }
   }
   if (!G.dead) heroAct(dt, calc(), G.enemy);
+  if (G.party) partyTick(dt, G.enemy);
   updatePet(dt, calc(), G.enemy);
   updateProjectiles(dt);
   updateFx(dt);
@@ -1182,12 +1245,18 @@ function flashButton(i) {
 
 function heroAct(dt, st, e) {
   G.swing -= dt;
+  if (G.feared > 0) { G.cast = null; return; }
+  // Interrupt a boss's spell with a stun or Kick when one is ready (ignoring the usual health conditions)
+  if (G.gcd <= 0 && !G.cast && alive(e) && e.cast && e.cast.int) {
+    const ab = abilities().find(a => a.stun && usable(Object.assign(Object.create(a), { cond: a.cond && Object.assign({}, a.cond, { hpBelow: null, targetBelow: null }) }), st, e));
+    if (ab) { startAbility(ab, st, e); return; }
+  }
   if (G.cast) {
     const c = G.cast;
-    if (c.needsTarget && (!alive(e) || c.e !== e)) G.cast = null;
+    if ((c.needsTarget && (!alive(e) || c.e !== e)) || (c.partyHeal && !memberAlive(c.target))) G.cast = null;
     else {
       c.t += dt;
-      if (c.t >= c.total) { G.cast = null; resolveAbility(c.ab, st); }
+      if (c.t >= c.total) { G.cast = null; if (c.partyHeal) resolvePartyHeal(c.ab, c.target, st); else resolveAbility(c.ab, st); }
       return;
     }
   }
@@ -1196,6 +1265,12 @@ function heroAct(dt, st, e) {
     const ab = abById(G.queued), why = manualBlock(ab, st, e);
     if (!why) { G.queued = null; startAbility(ab, calc(), e); if (G.cast) return; }
     else if (why !== 'wait') { G.queued = null; uiMessage(why); }
+  }
+  // Healing a dungeon group: heals come first, otherwise only auto-attacks / wand
+  if (G.party && G.partyRole === 'heal') {
+    if (healerBrain(st)) return;
+    heroAuto(st, e, false);
+    return;
   }
   const list = abilities();
   for (const ab of list) if (ab.nogcd && usable(ab, st, e)) startAbility(ab, calc(), e);
@@ -1209,6 +1284,11 @@ function heroAct(dt, st, e) {
     }
   }
   if (G.cast) return;
+  heroAuto(st, e, acted);
+}
+
+// Auto-attack, auto shot or wand between abilities
+function heroAuto(st, e, acted) {
   const auto = isCat() ? 'melee' : cls().auto;
   if (G.swing > 0) return;
   if (auto === 'melee' && alive(e) && e.state === 'fight') { G.swing = st.swing; whiteSwing(st, e); }
@@ -1280,7 +1360,7 @@ function updateFx(dt) {
   for (const p of G.particles) { p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 300 * dt; p.life -= dt; }
   G.particles = G.particles.filter(p => p.life > 0);
 
-  const type = zone().weather;
+  const type = scene().weather;
   if (G.weatherType !== type) { G.weather = []; G.weatherType = type; }
   const want = { snow: 70, leaves: 14, embers: 40, fireflies: 18, dust: 24, rain: 90 }[type] || 0;
   while (G.weather.length < want) {
@@ -1316,6 +1396,9 @@ function lookFor(raceId, clsId, eq) {
       shoulder: !!eq.shoulder, waist: !!eq.waist,
       offhand: off ? (off.otype || off.wtype) : null, offhandQ: off ? off.q : 0,
       tabard: eq.tabard ? eq.tabard.color : null, shirt: eq.shirt ? eq.shirt.color : null,
+      // Armor sets (look per armor type × source × quality, see gearlook.js)
+      sets: Object.fromEntries(['head', 'shoulder', 'chest', 'wrist', 'hands', 'waist', 'legs', 'feet'].map(s => [s, eq[s] && eq[s].atype ? gearSet(eq[s]) : null])),
+      weaponTheme: gearTheme(w), offhandTheme: gearTheme(off),
     },
   });
 }
@@ -1333,33 +1416,101 @@ function heroPose() {
 }
 
 function draw() {
-  const ctx = G.ctx, z = zone();
-  ctx.setTransform(G.scale, 0, 0, G.scale, 0, 0);
-  drawBackground(ctx, G, z);
-  drawWeather(ctx, G.weather, z.weather);
+  const main = G.ctx, z = scene();
+  // Sprite style: background, scenery and figures on separate layers, each post-processed (see pixelfx.js)
+  const sprites = pixelSize() && spriteStyle();
+  const cw = G.canvas.width, ch = G.canvas.height;
+  let ctx = main, scen = null;
+  if (sprites) {
+    const bg = pixLayer('bg', cw, ch);
+    scen = pixLayer('scenery', cw, ch);
+    bg.setTransform(G.scale, 0, 0, G.scale, 0, 0); scen.setTransform(G.scale, 0, 0, G.scale, 0, 0);
+    drawBackground(bg, G, z, scen);
+    if (retroPalette()) palettePass(bg, cw, ch, false);   // flat colour bands, like hand-made pixel art
+    spritePass(scen, cw, ch, { outline: 0.7, light: 0.14, shade: 0.2 });
+    main.setTransform(1, 0, 0, 1, 0, 0);
+    main.drawImage(bg.canvas, 0, 0);
+    main.setTransform(G.scale, 0, 0, G.scale, 0, 0);
+    drawWeather(main, G.weather, z.weather);
+    main.setTransform(1, 0, 0, 1, 0, 0);
+    main.drawImage(scen.canvas, 0, 0);
+    ctx = pixLayer('sprites', cw, ch);
+    ctx.setTransform(G.scale, 0, 0, G.scale, 0, 0);
+  } else {
+    main.setTransform(G.scale, 0, 0, G.scale, 0, 0);
+    drawBackground(main, G, z);
+    drawWeather(main, G.weather, z.weather);
+  }
   if (G.levelFx > 0) drawLevelUp(ctx, G.heroX, G.groundY, G.levelFx);
   const e = G.enemy;
   if (e && hasDot(e, 'searing_totem')) drawTotem(ctx, G.heroX + 46, G.groundY + 4, G.t);
   const pet = G.dead ? null : petDef();
   if (pet && pet.kind !== 'beast') drawPet(ctx, G.heroX - 46, G.groundY, G.t, pet, G.walking, G.petAnim);
+  // Ride between fights; hop off (with a puff of dust) when a fight starts
+  const mounted = !G.dead && !isCat() && isMounted();
+  if (G.wasMounted && !mounted && !G.dead) burst(G.heroX, G.groundY - 6, '#c8b896', 10);
+  G.wasMounted = mounted;
+  const comp = !G.dead && !G.party && S.companion && petById(S.companion);
+  if (comp) drawCompanion(ctx, G.heroX - (pet && pet.kind !== 'beast' ? 92 : mounted ? 72 : 50), G.groundY, G.t, comp, G.walking);
   if (G.dead) drawTombstone(ctx, G.heroX, G.groundY, G.t);
+  else if (mounted) {
+    drawMount(ctx, G.heroX, G.groundY, G.t, mountById(S.mount), G.walking);
+    drawCharacter(ctx, G.heroX + 4, G.groundY - 56, G.t, Object.assign(heroPose(), { walking: false }), lookFor(S.race, S.cls, S.equipment));
+  }
   else if (isCat()) drawCatForm(ctx, G.heroX, G.groundY, G.t, G.walking, G.heroSwing, G.hurt, { race: S.race });
   else drawCharacter(ctx, G.heroX, G.groundY, G.t, heroPose(), lookFor(S.race, S.cls, S.equipment));
   if (pet && pet.kind === 'beast') drawPet(ctx, G.heroX + 52, G.groundY + 2, G.t, pet, G.walking, G.petAnim);
+  if (G.party) drawParty(ctx);
   if (e) drawEnemy(ctx, e, G);
-  drawProjectiles(ctx, G.proj);
-  drawParticles(ctx, G.particles);
-  drawFCT(ctx, G.fct);
+  if (sprites) {
+    spritePass(ctx, cw, ch);
+    main.setTransform(1, 0, 0, 1, 0, 0);
+    main.drawImage(ctx.canvas, 0, 0);
+    main.setTransform(G.scale, 0, 0, G.scale, 0, 0);
+  }
+  drawProjectiles(main, G.proj);
+  drawParticles(main, G.particles);
+  if (pixelSize() && retroPalette()) palettePass(main, cw, ch, false);
+  // Combat text on the full-resolution overlay so it stays readable
+  const fx = G.fxCtx;
+  if (fx) {
+    fx.setTransform(1, 0, 0, 1, 0, 0); fx.clearRect(0, 0, G.fxCanvas.width, G.fxCanvas.height);
+    fx.setTransform(G.fxScale, 0, 0, G.fxScale, 0, 0);
+    drawFCT(fx, G.fct);
+  } else drawFCT(ctx, G.fct);
+}
+
+// ---------- pixel-art look ----------
+const pixelSize = () => { const v = ACC && ACC.settings && ACC.settings.pixel; return v === undefined ? CONFIG.PIXEL : v; };
+const retroPalette = () => !(ACC && ACC.settings && ACC.settings.retro === false);
+const spriteStyle = () => !(ACC && ACC.settings && ACC.settings.sprites === false);
+// Size a canvas to its on-screen box: low resolution (logical height / pixel size) or full device resolution
+function sizeCanvas(c, logicalH) {
+  const r = c.getBoundingClientRect(), P = pixelSize();
+  let w, h;
+  if (P) { h = Math.max(1, Math.round(logicalH / P)); w = Math.max(1, Math.round(h * r.width / Math.max(1, r.height))); }
+  else { const dpr = Math.min(2, window.devicePixelRatio || 1); w = Math.max(1, Math.round(r.width * dpr)); h = Math.max(1, Math.round(r.height * dpr)); }
+  if (c.width !== w || c.height !== h) { c.width = w; c.height = h; }
+  c.classList.toggle('pixelated', !!P);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = !P;
+  return ctx;
 }
 
 function resize() {
-  const c = G.canvas, r = c.getBoundingClientRect();
-  const dpr = Math.min(2, window.devicePixelRatio || 1);
-  c.width = Math.max(1, Math.round(r.width * dpr));
-  c.height = Math.max(1, Math.round(r.height * dpr));
+  const c = G.canvas;
+  sizeCanvas(c, G.H);
+  PX = pixelSize() || 0.5;
+  // Overlay for combat text: always full resolution
+  if (G.fxCanvas) {
+    const r = G.fxCanvas.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
+    G.fxCanvas.width = Math.max(1, Math.round(r.width * dpr)); G.fxCanvas.height = Math.max(1, Math.round(r.height * dpr));
+    G.fxScale = G.fxCanvas.height / G.H;
+  }
+  const pc = $('#tPortrait');
+  if (pc) { const n = pixelSize() ? 40 : 128; if (pc.width !== n) { pc.width = pc.height = n; } pc.classList.toggle('pixelated', !!pixelSize()); }
   G.scale = c.height / G.H;
   G.W = c.width / G.scale;
-  G.heroX = clamp(G.W * 0.16, 80, 180);
+  partyLayout();   // places the hero (and a dungeon group)
   scaleBar();
 }
 
@@ -1377,7 +1528,7 @@ function updateHUD() {
   setHTML('money', $('#money'), moneyHTML(S.copper));
   setText('plv', $('#pLevel'), S.level);
   setHTML('picon', $('#pIcon'), isCat() ? '🐈' : classIconHTML(S.cls));
-  setText('pname', $('#pName'), S.name);
+  setText('pname', $('#pName'), displayName());
   if (G.hud.pcol !== C.color) { G.hud.pcol = C.color; $('#pName').style.color = C.color; }
   setPct('php', $('#pHp'), S.hp / st.maxHp);
   setText('phpT', $('#pHpText'), `${fmt(Math.max(0, S.hp))} / ${fmt(st.maxHp)}`);
@@ -1413,7 +1564,11 @@ function updateHUD() {
   const show = !!e && !G.dead;
   // Hidden but still taking up room, so the quest tracker below it doesn't jump between enemies
   if (G.hud.tshow !== show) { G.hud.tshow = show; tf.classList.toggle('vhide', !show); }
-  setHTML('qtrack', $('#qtrack'), questTrackerHTML());
+  setHTML('qtrack', $('#qtrack'), G.run ? '' : questTrackerHTML());
+  partyFramesUpdate();
+  const dp = dungeonProgressHTML();
+  setHTML('dprog', $('#dprog'), dp);
+  if (G.hud.dprogOn !== !!dp) { G.hud.dprogOn = !!dp; $('#dprog').classList.toggle('hidden', !dp); $('#stage').classList.toggle('indng', !!dp); }
   if (show) {
     setText('tname', $('#tName'), e.def.name);
     const col = conColor(e.lv, S.level);
@@ -1425,6 +1580,14 @@ function updateHUD() {
     const pc = $('#tPortrait');
     if (pc) drawPortrait(pc.getContext('2d'), pc.width, pc.height, e.def, G.t + e.seed);
     setText('thpT', $('#tHpText'), `${fmt(Math.max(0, e.hp))} / ${fmt(e.hpMax)}`);
+    // Boss spell cast bar (shielded = can't be interrupted)
+    const ec = e.cast;
+    if (G.hud.tcast !== !!ec) { G.hud.tcast = !!ec; $('#tCast').classList.toggle('hidden', !ec); }
+    if (ec) {
+      setPct('tcastP', $('#tCastFill'), ec.t / ec.total);
+      setText('tcastT', $('#tCastText'), ec.name);
+      if (G.hud.tcastI !== ec.int) { G.hud.tcastI = ec.int; $('#tCast').classList.toggle('shielded', !ec.int); }
+    }
     const dk = e.dots.map(d => d.id).join() + (e.stun > 0 ? 's' : '');
     if (G.hud.tdots !== dk) {
       G.hud.tdots = dk;
@@ -1439,8 +1602,8 @@ function updateHUD() {
 }
 
 function showZoneBanner() {
-  const z = zone(), el = $('#zoneBanner');
-  el.innerHTML = `<div class="zb-name">${esc(z.name)}</div><div class="zb-lv">Levels ${z.min}–${z.max}</div>`;
+  const z = scene(), el = $('#zoneBanner');
+  el.innerHTML = `<div class="zb-name">${esc(z.name)}</div><div class="zb-lv">${z.raid ? `Raid · ${z.size}-player` : `${z.dungeon ? 'Dungeon · ' : ''}Levels ${z.min}–${z.max}`}</div>`;
   el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
   $('#zoneLabel').textContent = z.name;
   musicSetContext(z.id);
@@ -1601,7 +1764,7 @@ function spellTooltipHTML(ab) {
 
 // ---------- panels ----------
 const TABS = [
-  ['character', 'Character', '🛡️'], ['bags', 'Bags', '🎒'], ['spells', 'Spellbook', '📖'], ['talents', 'Talents', '⭐'], ['quests', 'Quest Log', '📜'],
+  ['character', 'Character', '🛡️'], ['bags', 'Bags', '🎒'], ['spells', 'Spellbook', '📖'], ['talents', 'Talents', '⭐'], ['quests', 'Quest Log', '📜'], ['dungeons', 'Dungeons & Raids', '🏰'], ['collections', 'Collections', '🐎'], ['achievements', 'Achievements', '🏆'],
   ['professions', 'Professions', '⚒️'], ['zones', 'World Map', '🗺️'], ['log', 'Combat Log', '📋'], ['settings', 'Settings', '⚙️'],
 ];
 
@@ -1617,7 +1780,7 @@ function renderPanel() {
   if (G.sliding) return;   // don't rebuild the panel under a slider being dragged
   G.dirty = false;
   if (!S) return;
-  const fn = { character: panelCharacter, bags: panelBags, spells: panelSpells, talents: panelTalents, quests: panelQuests, professions: panelProfessions, zones: panelZones, log: panelLog, settings: panelSettings }[G.tab];
+  const fn = { character: panelCharacter, bags: panelBags, spells: panelSpells, talents: panelTalents, quests: panelQuests, dungeons: panelDungeons, collections: panelCollections, achievements: panelAchievements, professions: panelProfessions, zones: panelZones, log: panelLog, settings: panelSettings }[G.tab];
   $('#panel').innerHTML = fn();
   refreshPanel();
 }
@@ -1716,7 +1879,7 @@ function panelCharacter() {
       <div class="wf-head">
         <div class="wf-portrait">${isCat() ? '<span class="cicon-fb">🐈</span>' : classIconHTML(S.cls)}</div>
         <div class="wf-title">
-          <div class="wf-name">${esc(S.name)}</div>
+          <div class="wf-name">${esc(displayName())}</div>
           <div class="wf-sub">Level ${L} ${R.name} <span style="color:${C.color}">${C.name}</span></div>
           <div class="wf-guild">${spec ? `${esc(spec)} · ` : ''}${esc(zone().name)}</div>
         </div>
@@ -1745,6 +1908,7 @@ function panelCharacter() {
         <div class="wrow"><span>${esc(R.racial.name)}</span></div>
         <p class="muted small">${esc(R.racial.desc)}</p>
       </div>
+      ${setBonusesHTML()}
       <div class="sidecard">
         <h3>Statistics</h3>
         ${statRow('Experience bonus', '+' + Math.round((st.xpMult / CONFIG.XP_RATE - 1) * 100) + '%')}
@@ -1888,6 +2052,11 @@ function panelSettings() {
   return `<h3>Settings</h3>
   <div class="settings">
     ${musicSettingsHTML()}
+    <h4>Graphics</h4>
+    <label>Pixel art:
+      <select data-act="pixelSize">${[[0, 'Off (smooth)'], [2, 'Fine pixels'], [3, 'Chunky pixels']].map(([v, n]) => `<option value="${v}" ${pixelSize() === v ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
+    <label class="toggle"><input type="checkbox" data-act="spriteStyle" ${spriteStyle() ? 'checked' : ''} ${pixelSize() ? '' : 'disabled'}> Sprite style (outlines and shading)</label>
+    <label class="toggle"><input type="checkbox" data-act="retro" ${retroPalette() ? 'checked' : ''} ${pixelSize() ? '' : 'disabled'}> Retro colour palette (64 colours)</label>
     <h4>Game</h4>
     <label>Auto-sell loot below quality:
       <select data-act="autoSell">${opts.map((o, i) => `<option value="${i}" ${S.autoSell === i ? 'selected' : ''}>${o}</option>`).join('')}</select></label>
@@ -1914,6 +2083,7 @@ function itemTooltipHTML(it) {
   for (const k of STAT_KEYS) if (it.stats[k]) h += `<div class="tt-stat">+${it.stats[k]} ${STAT_NAMES[k]}</div>`;
   h += `<div class="tt-req${it.req > S.level ? ' bad' : ''}">Requires Level ${it.req}</div>`;
   h += `<div class="muted">Item Level ${it.ilvl} · ${Q.name}</div>`;
+  if (it.set) h += setTooltipHTML(it);
   h += `<div class="tt-sell">Sell Price: ${moneyHTML(it.sell)}</div>`;
   const cur = S.equipment[targetSlot(it)];
   if (cur && cur.id !== it.id) {
@@ -1972,9 +2142,9 @@ function renderSelect() {
     const k = CLASSES[c.cls], r = RACES.find(x => x.id === c.race);
     return `<button class="charrow${c.id === sel.id ? ' on' : ''}" data-c="pick" data-v="${c.id}">
       <span class="cr-i">${classIconHTML(c.cls, 'cp-img')}</span>
-      <span class="cr-t"><b style="color:${k.color}">${esc(c.name)}</b><span>Level ${c.level} ${r.name} ${k.name}</span><span class="muted">${esc(zoneName(c.zoneId))}</span></span></button>`;
+      <span class="cr-t"><b style="color:${k.color}">${esc(c.title ? titleName(c.title, c.name) : c.name)}</b><span>Level ${c.level} ${r.name} ${k.name}</span><span class="muted">${esc(zoneName(c.zoneId))}</span></span></button>`;
   }).join('');
-  const legacy = accountFx().xp;
+  const legacy = Math.min(LEGACY_XP_CAP, ACC.characters.filter(c => c.level >= CONFIG.LEVEL_CAP).length * LEGACY_XP_PER_60);
   $('#create').innerHTML = `<div class="cbox">
     <div class="ctitle">⚔️ The Leveling Road</div>
     <div class="csub">Select your character</div>
@@ -2076,8 +2246,7 @@ function renderCreate() {
 function sizePreview() {
   const cv = $('#preview');
   if (!cv) return;
-  const r = cv.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
-  cv.width = Math.max(1, Math.round(r.width * dpr)); cv.height = Math.max(1, Math.round(r.height * dpr));
+  sizeCanvas(cv, 220);
 }
 
 function drawPreview(t) {
@@ -2102,17 +2271,15 @@ function drawPreview(t) {
   const hunter = c.cls === 'hunter', caster = CLASSES[c.cls].auto === 'wand';
   const pose = { walking: false, swing: !hunter && !caster && sw < 1 ? sw : -1, hurt: 0, ranged: hunter, shoot: hunter ? Math.max(0, Math.sin(t * 1.6)) : 0,
     cast: caster && Math.sin(t * 1.2) > 0.3 ? { p: (Math.sin(t * 1.2) - 0.3) / 0.7, color: CLASSES[c.cls].look.orb || '#8ad8ff' } : null, scale: 1.05 };
-  drawCharacter(ctx, W * 0.42, 176, t, pose, look);
+  if (pixelSize() && spriteStyle()) drawAsSprite(ctx, cv.width, cv.height, s, c2 => drawCharacter(c2, W * 0.42, 176, t, pose, look));
+  else drawCharacter(ctx, W * 0.42, 176, t, pose, look);
 }
 
 // The hero model in the character sheet
 function drawSheetModel() {
   const cv = $('#sheetModel');
   if (!cv) return;
-  const r = cv.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
-  const w = Math.max(1, Math.round(r.width * dpr)), h = Math.max(1, Math.round(r.height * dpr));
-  if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
-  const ctx = cv.getContext('2d');
+  const ctx = sizeCanvas(cv, 230), w = cv.width, h = cv.height;
   // On the race scene the canvas is transparent and the hero stands near the bottom; otherwise on a dark backdrop
   const pd = cv.parentElement.classList.contains('pd');
   const H = 230, s = h / H, W = w / s;
@@ -2129,8 +2296,12 @@ function drawSheetModel() {
     ctx.fillStyle = 'rgba(255,255,255,0.05)'; ell(ctx, cx, feet, 70, 10);
   }
   const t = G.t;
-  if (isCat()) drawCatForm(ctx, cx + 10, feet, t, false, -1, 0, { race: S.race });
-  else drawCharacter(ctx, cx, feet, t, { walking: false, swing: -1, hurt: 0, ranged: S.cls === 'hunter', shoot: 0, cast: null, scale }, lookFor(S.race, S.cls, S.equipment));
+  const fig = c2 => {
+    if (isCat()) drawCatForm(c2, cx + 10, feet, t, false, -1, 0, { race: S.race });
+    else drawCharacter(c2, cx, feet, t, { walking: false, swing: -1, hurt: 0, ranged: S.cls === 'hunter', shoot: 0, cast: null, scale }, lookFor(S.race, S.cls, S.equipment));
+  };
+  if (pixelSize() && spriteStyle()) drawAsSprite(ctx, w, h, s, fig);
+  else fig(ctx);
 }
 
 function enterWorld() {
@@ -2142,6 +2313,7 @@ function enterWorld() {
   Object.assign(S, { name, faction: c.faction, race: c.race, cls: c.cls, welcomed: true });
   resetRuntime();
   S.zoneId = race().start;
+  S.zonesSeen = [S.zoneId];
   addCharacter(S);
   giveStarterGear();
   for (const ab of abilities()) if (!ab.talent && ab.learn <= 1) S.spells[ab.id] = 1;
@@ -2226,6 +2398,28 @@ const ACTIONS = {
     if (S.autoQuest) for (const [q, st] of questActive()) if (st.done) turnInQuest(q.id, bestQuestReward(st.rewards));
     markDirty();
   },
+  trainRiding() { trainRiding(); },
+  buyMount(id) { buyMount(id); },
+  setMount(id) { setMount(id); },
+  buyPet(id) { buyPet(id); },
+  setPet(id) { setPet(id); },
+  collAll(v, el) { G.collAll = el.checked; markDirty(); },
+  pixelSize(v, el) { ACC.settings.pixel = +el.value; saveAccount(); resize(); markDirty(); },
+  retro(v, el) { ACC.settings.retro = el.checked; saveAccount(); },
+  spriteStyle(v, el) { ACC.settings.sprites = el.checked; saveAccount(); },
+  achCat(c) { G.achCat = c; markDirty(); },
+  achCatSel(v, el) { G.achCat = el.value; markDirty(); },
+  setTitle(v, el) { setTitle(el.value); },
+  dungeonEnter(id) { openDraft(id); },
+  draftRole(r) { draftSetRole(r); },
+  draftPick(id) { draftToggle(id); },
+  draftBest() { draftBest(); },
+  draftReroll() { draftReroll(); },
+  draftLast() { draftLast(); },
+  draftEnter() { draftEnter(); },
+  draftBack() { G.draft = null; markDirty(); },
+  dungeonLeave() { modal('<h3>Leave the dungeon?</h3><p>Bosses you have already defeated stay dead, so you can pick up where you left off.</p>', [['Leave', () => endDungeon('leave'), 'danger'], ['Stay']]); },
+  autoDungeon(v, el) { S.autoDungeon = el.checked; markDirty(); },
   questSel(id) { G.questSel = id; G.questChoice = 0; markDirty(); },
   questChoice(i) { G.questChoice = +i; markDirty(); },
   questTurnIn(id) { turnInQuest(id, G.questChoice || 0); G.questChoice = 0; },
@@ -2323,8 +2517,10 @@ function frame(ts) {
   if (G.refreshT > 0.25) { G.refreshT = 0; refreshPanel(); }
   G.charT = (G.charT || 0) + dt;
   // Refresh the character sheet every second, but not while a stat dropdown is open
-  if (G.tab === 'character' && G.charT > 1 && !(document.activeElement && document.activeElement.tagName === 'SELECT')) { G.charT = 0; renderPanel(); }
+  if ((G.tab === 'character' || G.tab === 'dungeons') && G.charT > 1 && !(document.activeElement && document.activeElement.tagName === 'SELECT')) { G.charT = 0; renderPanel(); }
   if (G.tab === 'character') drawSheetModel();
+  G.achT = (G.achT || 0) + dt;
+  if (G.achT > 2) { G.achT = 0; achCheck(); }
   G.saveT += dt;
   if (G.saveT > CONFIG.AUTOSAVE_SECONDS) { G.saveT = 0; save(); }
   requestAnimationFrame(frame);
@@ -2333,6 +2529,8 @@ function frame(ts) {
 function boot() {
   G.canvas = $('#game');
   G.ctx = G.canvas.getContext('2d');
+  G.fxCanvas = $('#fxText');
+  G.fxCtx = G.fxCanvas ? G.fxCanvas.getContext('2d') : null;
   document.title = CONFIG.GAME_NAME;
   applyUiAssets();
   load();

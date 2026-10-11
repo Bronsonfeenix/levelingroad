@@ -1,0 +1,1 @@
+Achievement icons (optional), named like the achievement, e.g. "Level 10.jpg", "The Deadmines.jpg", "Explorer.jpg".

@@ -75,6 +75,14 @@ File names are case-sensitive on GitHub Pages, so keep the capitalisation shown 
 | `assets/Interface/MainMenuBar/UI-MainMenuBar-Dwarf.png` | Action bar | [MainMenuBar/UI-MainMenuBar-Dwarf](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/mainmenubar/ui-mainmenubar-dwarf.blp` |
 | `assets/Interface/QuestFrame/QuestBG.png` | Quest log parchment | [QuestFrame/QuestBG](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/questframe/questbg.blp` |
 | `assets/Interface/QuestFrame/UI-QuestLog-BookIcon.png` | Quest log icon | [QuestFrame/UI-QuestLog-BookIcon](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/questframe/ui-questlog-bookicon.blp` |
+| `assets/Interface/AchievementFrame/UI-Achievement-Alert-Background.png` | Achievements (toast, rows, shields, progress bars) | [AchievementFrame/UI-Achievement-Alert-Background](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/achievementframe/ui-achievement-alert-background.blp` |
+| `assets/Interface/AchievementFrame/UI-Achievement-Parchment-Horizontal.png` | Achievements (toast, rows, shields, progress bars) | [AchievementFrame/UI-Achievement-Parchment-Horizontal](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/achievementframe/ui-achievement-parchment-horizontal.blp` |
+| `assets/Interface/AchievementFrame/UI-Achievement-Parchment-Horizontal-Desaturated.png` | Achievements (toast, rows, shields, progress bars) | [AchievementFrame/UI-Achievement-Parchment-Horizontal-Desaturated](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/achievementframe/ui-achievement-parchment-horizontal-desaturated.blp` |
+| `assets/Interface/AchievementFrame/UI-Achievement-Shield.png` | Achievements (toast, rows, shields, progress bars) | [AchievementFrame/UI-Achievement-Shield](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/achievementframe/ui-achievement-shield.blp` |
+| `assets/Interface/AchievementFrame/UI-Achievement-Shield-Desaturated.png` | Achievements (toast, rows, shields, progress bars) | [AchievementFrame/UI-Achievement-Shield-Desaturated](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/achievementframe/ui-achievement-shield-desaturated.blp` |
+| `assets/Interface/AchievementFrame/UI-Achievement-IconFrame.png` | Achievements (toast, rows, shields, progress bars) | [AchievementFrame/UI-Achievement-IconFrame](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/achievementframe/ui-achievement-iconframe.blp` |
+| `assets/Interface/AchievementFrame/UI-Achievement-ProgressBar-Border.png` | Achievements (toast, rows, shields, progress bars) | [AchievementFrame/UI-Achievement-ProgressBar-Border](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/achievementframe/ui-achievement-progressbar-border.blp` |
+| `assets/Interface/AchievementFrame/UI-Achievement-Criteria-Check.png` | Achievements (toast, rows, shields, progress bars) | [AchievementFrame/UI-Achievement-Criteria-Check](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/achievementframe/ui-achievement-criteria-check.blp` |
 | `assets/Interface/Buttons/UI-Quickslot2.png` | Action bar buttons | [Buttons/UI-Quickslot2](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/buttons/ui-quickslot2.blp` |
 | `assets/Interface/Buttons/UI-Quickslot-Depress.png` | Action bar buttons | [Buttons/UI-Quickslot-Depress](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/buttons/ui-quickslot-depress.blp` |
 | `assets/Interface/Buttons/ButtonHilight-Square.png` | Action bar buttons | [Buttons/ButtonHilight-Square](https://github.com/Gethe/wow-ui-textures) · [wago.tools](https://wago.tools/files) `interface/buttons/buttonhilight-square.blp` |
@@ -159,6 +167,20 @@ Background music is played from `music/<Name>.mp3` (see `MUSIC` and `MUSIC_GENER
 | `battle05.mp3` | **All zones (general)** |
 | `world-of-warcraft-lvl-up.mp3` | Level-up jingle |
 | `gnomeragon01-zone.mp3`, `KelThuzad1A.mp3`, `pvp1.mp3` | Not used yet (saved for dungeons, raids and battlegrounds) |
+
+## Mount and companion icons
+
+Optional icons for the Collections tab, named like the mount or companion (an emoji is shown until the file exists): ``icons/mounts/<Name>.jpg`` and ``icons/pets/<Name>.jpg``. Source: the item icons on Wowhead (e.g. ``inv_misc_foot_kodo``).
+
+Mounts: `Brown Horse`, `Swift Palomino`, `Gray Ram`, `Swift Gray Ram`, `Striped Nightsaber`, `Swift Frostsaber`, `Red Mechanostrider`, `Swift Green Mechanostrider`, `Timber Wolf`, `Swift Timber Wolf`, `Brown Kodo`, `Great Brown Kodo`, `Emerald Raptor`, `Swift Olive Raptor`, `Red Skeletal Horse`, `Purple Skeletal Warhorse`, `Warhorse`, `Charger`, `Felsteed`, `Dreadsteed`, `Deathcharger's Reins`, `Swift Razzashi Raptor`, `Swift Zulian Tiger`, `Black Qiraji Battle Tank`
+
+Companions: `Cat Carrier (Bombay)`, `Cat Carrier (Cornish Rex)`, `Cat Carrier (Orange Tabby)`, `Cat Carrier (Silver Tabby)`, `Cat Carrier (Siamese)`, `Rabbit Crate (Snowshoe)`, `Great Horned Owl`, `Hawk Owl`, `Prairie Dog Whistle`, `Black Kingsnake`, `Brown Snake`, `Crimson Snake`, `Undercity Cockroach`, `Ancona Chicken`, `Parrot Cage (Cockatiel)`, `Parrot Cage (Senegal)`, `Mechanical Squirrel Box`, `Pet Bombling`, `Lil' Smoky`, `Cat Carrier (Black Tabby)`, `Parrot Cage (Hyacinth Macaw)`, `Parrot Cage (Green Wing Macaw)`, `Dark Whelpling`, `Disgusting Oozeling`, `Smolderweb Carrier`
+
+## Achievement icons
+
+Optional icons for the Achievements tab and toast, named like the achievement (an emoji is shown until the file exists): `icons/achievements/<Name>.jpg`. Any achievement-style icon from Wowhead works (e.g. `achievement_level_10`).
+
+Fixed names: `Deep Roots`, `Giddy Up!`, `Fast and Furious`, `Survivor`, `Loremaster`, `Explorer`, `World Traveler`, `Kingslayer`, `Flawless Victory`, `Speed Run`, `Dungeon Master`, `Swift and Mighty`, `Jack of All Trades`, `Double Trouble`, `United Races`, `Deathcharger's Reins`, `The Undying`, `Jenkins`, `The Patient`. Generated ones: `Level 10`…`Level 60`, `<Zone> Quests`, `Explore <Zone>`, one per dungeon name, and the kill/gold/collection milestones.
 
 ## Icons
 
